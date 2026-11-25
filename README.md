@@ -141,7 +141,6 @@ fails.
 - **Code execution** is a resource-limited subprocess, not a security sandbox:
   environment secrets are scrubbed and rlimits applied, but it is not safe for
   hostile third-party submissions.
-- **57 tasks** is a solid skeleton, not a statistically robust eval.
 - **Repository tasks** run in process-level isolation (temp cwd, scrubbed env,
   rlimits, `unshare -n` when permitted), not a container.
 

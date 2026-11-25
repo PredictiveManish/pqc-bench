@@ -123,7 +123,8 @@ The gates will reject an unsourced task. That is deliberate.
 
 - [x] CI runs the four gates on every push (`.github/workflows/ci.yml`).
 - [x] `LICENSE` present (MIT).
-- [ ] Repo public; README renders; `STANDARDS.md` links resolve.
+- [x] Repo public; README renders.
+- [ ] `STANDARDS.md` links verified.
 - [ ] Tag the release (`v1.0.0`).
 - [ ] (Optional) Mint a Zenodo DOI for citation.
 - [ ] Publish baseline results from at least 2–3 named models before presenting
