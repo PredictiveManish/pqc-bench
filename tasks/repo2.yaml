@@ -1,0 +1,80 @@
+# PQC-Eval — discovery & CBOM tasks (roadmap E13 / E14)
+
+- id: repo-discover-indirect
+  tier: engineering
+  type: repo
+  track: discovery
+  difficulty: 3
+  tags: [discovery, indirect-usage, evidence]
+  repo:
+    fixture: fixtures/svc-indirect
+    mode: discovery
+    expected_findings:
+      - {file: "crypto/provider.py", symbol: "hash_password", algorithm: "md5"}
+      - {file: "crypto/provider.py", symbol: "RSA2048", algorithm: "rsa-2048"}
+      - {file: "service.py", symbol: "hash_password", algorithm: "md5"}
+      - {file: "service.py", symbol: "sign_token", algorithm: "rsa-2048"}
+      - {file: "config.yaml", symbol: "signing.algorithm", algorithm: "rsa-2048"}
+  prompt: |
+    Audit the repository `fixtures/svc-indirect`. Cryptographic use is partly
+    INDIRECT: `service.py` calls into `crypto/provider.py`, and some algorithms
+    are selected in `config.yaml`.
+
+    Report every cryptographic finding, including indirect usage. Return JSON:
+
+    {"findings": [
+      {"file": "<path>", "symbol": "<function/class/identifier>",
+       "algorithm": "<md5|rsa-2048|...>", "operation": "<hash|sign|config|...>",
+       "line": <int>, "evidence": "<short justification>"}
+    ]}
+
+    Return only the JSON object.
+  gold: |
+    {"findings": [
+      {"file": "crypto/provider.py", "symbol": "hash_password", "algorithm": "md5",
+       "operation": "hash", "line": 7, "evidence": "hashlib.md5 in provider"},
+      {"file": "crypto/provider.py", "symbol": "RSA2048", "algorithm": "rsa-2048",
+       "operation": "sign", "line": 10, "evidence": "RSA signer class"},
+      {"file": "service.py", "symbol": "hash_password", "algorithm": "md5",
+       "operation": "hash", "line": 6, "evidence": "calls provider.hash_password"},
+      {"file": "service.py", "symbol": "sign_token", "algorithm": "rsa-2048",
+       "operation": "sign", "line": 10, "evidence": "calls provider.sign_token"},
+      {"file": "config.yaml", "symbol": "signing.algorithm", "algorithm": "rsa-2048",
+       "operation": "config", "line": 2, "evidence": "signing algorithm configured"}
+    ]}
+
+- id: repo-cbom
+  tier: engineering
+  type: repo
+  track: cbom
+  difficulty: 3
+  tags: [cbom, cyclonedx, inventory]
+  repo:
+    fixture: fixtures/svc-indirect
+    mode: artifact
+    target: cbom.json
+    run: ["python3", "check_cbom.py"]
+  prompt: |
+    Produce a CycloneDX-style Cryptographic Bill of Materials (CBOM) for the
+    repository `fixtures/svc-indirect`.
+
+    Requirements:
+      - `bomFormat` is exactly "CycloneDX"; include a `specVersion`.
+      - `components` is a non-empty list.
+      - Each component has a `name` and `cryptoProperties.assetType`.
+      - The inventory must include the MD5 hash and the RSA-2048 signing asset.
+
+    Return only the JSON object.
+  gold: |
+    {
+      "bomFormat": "CycloneDX",
+      "specVersion": "1.6",
+      "components": [
+        {"type": "cryptographic-asset", "name": "MD5",
+         "cryptoProperties": {"assetType": "algorithm",
+           "algorithmProperties": {"primitive": "hash", "executionEnvironment": "software"}}},
+        {"type": "cryptographic-asset", "name": "RSA-2048",
+         "cryptoProperties": {"assetType": "algorithm",
+           "algorithmProperties": {"primitive": "signature", "executionEnvironment": "software"}}}
+      ]
+    }

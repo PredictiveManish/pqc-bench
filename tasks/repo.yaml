@@ -1,0 +1,141 @@
+# PQC-Eval — repository-level engineering tier
+# These execute model output inside a fixture workspace (harness/repo_runner.py).
+
+- id: repo-discover-crypto
+  tier: engineering
+  type: repo
+  tags: [audit, discovery, crypto-hygiene]
+  repo:
+    fixture: fixtures/audit-app
+    mode: discovery
+    expected: ["KEY_BITS", "HARDCODED_KEY", "md5"]
+  prompt: |
+    You are auditing the repository in `fixtures/audit-app`. Identify the
+    weak-cryptography findings in `app.py`: the RSA key-size constant, the
+    hardcoded key, and the weak password hash.
+
+    For each finding, give the file name and the identifier involved.
+  gold: |
+    Findings in app.py:
+    1. KEY_BITS = 1024 — RSA modulus too small; must be at least 2048 bits.
+    2. _HARDCODED_KEY — a secret key embedded in source; load it from the
+       environment (APP_KEY) instead.
+    3. hash_password uses hashlib.md5 — broken hash; use SHA-256.
+
+- id: repo-patch-crypto
+  tier: engineering
+  type: repo
+  tags: [patch, remediation, crypto-hygiene]
+  repo:
+    fixture: fixtures/audit-app
+    mode: patch
+    target: app.py
+    run: ["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]
+  prompt: |
+    The repository `fixtures/audit-app` has weak cryptography in `app.py` and a
+    failing test suite in `tests/test_app.py`.
+
+    Current app.py:
+
+    ```python
+    import hashlib
+
+    KEY_BITS = 1024
+    _HARDCODED_KEY = b"0123456789abcdef"
+
+    def get_key():
+        return _HARDCODED_KEY
+
+    def hash_password(password: str) -> str:
+        return hashlib.md5(password.encode()).hexdigest()
+    ```
+
+    Rewrite `app.py` so the tests pass:
+      - KEY_BITS must be at least 2048.
+      - get_key() must read APP_KEY from the environment and raise RuntimeError
+        when it is unset.
+      - hash_password must use SHA-256.
+
+    Return the complete corrected `app.py` in one Python code block.
+  buggy: |
+    import hashlib
+
+    KEY_BITS = 1024
+    _HARDCODED_KEY = b"0123456789abcdef"
+
+    def get_key():
+        return _HARDCODED_KEY
+
+    def hash_password(password: str) -> str:
+        return hashlib.md5(password.encode()).hexdigest()
+  gold: |
+    ```python
+    import hashlib
+    import os
+
+    KEY_BITS = 2048
+
+
+    def get_key() -> bytes:
+        value = os.environ.get("APP_KEY")
+        if not value:
+            raise RuntimeError("APP_KEY is not set")
+        return value.encode()
+
+
+    def hash_password(password: str) -> str:
+        return hashlib.sha256(password.encode()).hexdigest()
+    ```
+
+- id: fullscheme-mlkem-encaps
+  tier: engineering
+  type: repo
+  tags: [full-scheme, ml-kem, kat, fips-203]
+  repo:
+    fixture: fixtures/mlkem-encaps
+    mode: kat
+    target: encaps.py
+    run: ["python3", "check_kat.py"]
+    timeout: 120
+  prompt: |
+    `fixtures/mlkem-encaps` provides `primitives.py` with H (SHA3-256), G
+    (SHA3-512), KDF (SHAKE256) and `k_pke_encrypt(ek, m, r)`, plus `kat.json`
+    with fixed vectors and `check_kat.py`.
+
+    The current `encaps.py` is wrong — it applies a key-derivation step that
+    FIPS 203 removed:
+
+    ```python
+    from primitives import H, G, KDF, k_pke_encrypt
+
+    def encaps(ek, m):
+        kr = G(m + H(ek))
+        K, r = kr[:32], kr[32:]
+        c = k_pke_encrypt(ek, m, r)
+        return KDF(K + H(c)), c
+    ```
+
+    Implement FIPS 203 ML-KEM encapsulation so that `encaps(ek, m)` returns
+    `(shared_secret, ciphertext)` matching the KAT vectors. Do not import or
+    call the reference implementation (kyber_py).
+
+    Return the complete corrected `encaps.py` in one Python code block.
+  buggy: |
+    from primitives import H, G, KDF, k_pke_encrypt
+
+    def encaps(ek, m):
+        kr = G(m + H(ek))
+        K, r = kr[:32], kr[32:]
+        c = k_pke_encrypt(ek, m, r)
+        return KDF(K + H(c)), c
+  gold: |
+    ```python
+    from primitives import H, G, k_pke_encrypt
+
+
+    def encaps(ek, m):
+        kr = G(m + H(ek))
+        K, r = kr[:32], kr[32:]
+        c = k_pke_encrypt(ek, m, r)
+        return K, c
+    ```

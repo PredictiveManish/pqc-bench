@@ -1,0 +1,270 @@
+# PQC-Eval — engineering tier
+# Executable tasks graded against kyber-py (independent) or stdlib.
+# Each has a verified `gold`; debugging tasks also carry a failing `buggy`.
+
+- id: impl-cbd2
+  tier: implementation
+  type: code
+  tags: [ml-kem, sampling, fips-203]
+  checker: graders/checks/cbd.py
+  prompt: |
+    FIPS 203 defines SamplePolyCBD_eta. For eta = 2, the input is 128 bytes
+    (1024 bits) and the output is 256 coefficients.
+
+    Implement a module-level Python function:
+
+        cbd2(b: bytes) -> list[int]
+
+    returning the 256 coefficients reduced modulo q = 3329 (i.e. integers in
+    [0, 3329)). Return one Python code block.
+  gold: |
+    ```python
+    Q = 3329
+
+    def cbd2(b):
+        bits = []
+        for byte in b:
+            for j in range(8):
+                bits.append((byte >> j) & 1)
+        out = []
+        for i in range(256):
+            a = bits[4*i] + bits[4*i+1]
+            c = bits[4*i+2] + bits[4*i+3]
+            out.append((a - c) % Q)
+        return out
+    ```
+
+- id: impl-byteencode12
+  tier: implementation
+  type: code
+  tags: [ml-kem, serialisation, fips-203]
+  checker: graders/checks/byteencode.py
+  prompt: |
+    Implement FIPS 203 ByteEncode_12: pack 256 coefficients (each 12 bits, in
+    [0, 3329)) into 384 bytes using little-endian bit packing.
+
+    Implement a module-level Python function:
+
+        byteencode12(a: list[int]) -> bytes
+
+    Return one Python code block.
+  gold: |
+    ```python
+    def byteencode12(a):
+        out = bytearray()
+        acc = 0
+        nb = 0
+        for x in a:
+            acc |= (x & 0xFFF) << nb
+            nb += 12
+            while nb >= 8:
+                out.append(acc & 0xFF)
+                acc >>= 8
+                nb -= 8
+        return bytes(out)
+    ```
+
+- id: impl-bytedecode12
+  tier: implementation
+  type: code
+  tags: [ml-kem, serialisation, fips-203]
+  checker: graders/checks/bytedecode.py
+  prompt: |
+    Implement FIPS 203 ByteDecode_12: unpack 384 bytes into 256 coefficients
+    (12 bits each, little-endian), the inverse of ByteEncode_12.
+
+    Implement a module-level Python function:
+
+        bytedecode12(b: bytes) -> list[int]
+
+    Return one Python code block.
+  gold: |
+    ```python
+    def bytedecode12(b):
+        out = []
+        acc = 0
+        nb = 0
+        i = 0
+        while len(out) < 256:
+            while nb < 12:
+                acc |= b[i] << nb
+                i += 1
+                nb += 8
+            out.append(acc & 0xFFF)
+            acc >>= 12
+            nb -= 12
+        return out
+    ```
+
+- id: impl-implicit-reject
+  tier: implementation
+  type: code
+  tags: [ml-kem, decapsulation, fips-203]
+  checker: graders/checks/implicit_reject.py
+  prompt: |
+    In ML-KEM decapsulation, if the re-encryption check fails the algorithm
+    returns an implicit-rejection value K_bar = SHAKE256(z || c, 32), where z is
+    the 32-byte decapsulation key component and c is the ciphertext.
+
+    Implement a module-level Python function:
+
+        implicit_reject(z: bytes, c: bytes) -> bytes
+
+    returning the 32-byte value. Return one Python code block.
+  gold: |
+    ```python
+    import hashlib
+
+    def implicit_reject(z, c):
+        return hashlib.shake_256(z + c).digest(32)
+    ```
+
+- id: impl-validate-ek
+  tier: implementation
+  type: code
+  tags: [ml-kem, input-validation, secure-coding]
+  checker: graders/checks/validate_ek.py
+  prompt: |
+    An ML-KEM-768 encapsulation key is exactly 1184 bytes. Implement a
+    module-level function that rejects malformed keys before use:
+
+        validate_ek(ek: bytes) -> bool
+
+    returning True only when the key length is exactly 1184 bytes, and False
+    otherwise. Return one Python code block.
+  gold: |
+    ```python
+    def validate_ek(ek):
+        return len(ek) == 1184
+    ```
+
+- id: dbg-cbd-swap
+  tier: debugging
+  type: code
+  tags: [ml-kem, sampling, bug]
+  checker: graders/checks/cbd.py
+  prompt: |
+    This SamplePolyCBD_eta=2 implementation is wrong: it computes a - c using
+    the two bit-halves in the wrong order, so every coefficient has the wrong
+    sign. Fix it and return the full corrected module (keep the name `cbd2`).
+    One Python code block.
+
+    ```python
+    Q = 3329
+    def cbd2(b):
+        bits = []
+        for byte in b:
+            for j in range(8):
+                bits.append((byte >> j) & 1)
+        out = []
+        for i in range(256):
+            a = bits[4*i+2] + bits[4*i+3]
+            c = bits[4*i] + bits[4*i+1]
+            out.append((a - c) % Q)
+        return out
+    ```
+  buggy: |
+    Q = 3329
+    def cbd2(b):
+        bits = []
+        for byte in b:
+            for j in range(8):
+                bits.append((byte >> j) & 1)
+        out = []
+        for i in range(256):
+            a = bits[4*i+2] + bits[4*i+3]
+            c = bits[4*i] + bits[4*i+1]
+            out.append((a - c) % Q)
+        return out
+  gold: |
+    ```python
+    Q = 3329
+    def cbd2(b):
+        bits = []
+        for byte in b:
+            for j in range(8):
+                bits.append((byte >> j) & 1)
+        out = []
+        for i in range(256):
+            a = bits[4*i] + bits[4*i+1]
+            c = bits[4*i+2] + bits[4*i+3]
+            out.append((a - c) % Q)
+        return out
+    ```
+
+- id: dbg-byteencode-endian
+  tier: debugging
+  type: code
+  tags: [ml-kem, serialisation, bug]
+  checker: graders/checks/byteencode.py
+  prompt: |
+    This ByteEncode_12 implementation uses big-endian bit packing, so it
+    disagrees with FIPS 203, which is little-endian. Fix it and return the full
+    corrected module (keep the name `byteencode12`). One Python code block.
+
+    ```python
+    def byteencode12(a):
+        out = bytearray()
+        acc = 0
+        nb = 0
+        for x in a:
+            acc = (acc << 12) | (x & 0xFFF)
+            nb += 12
+            while nb >= 8:
+                nb -= 8
+                out.append((acc >> nb) & 0xFF)
+        return bytes(out)
+    ```
+  buggy: |
+    def byteencode12(a):
+        out = bytearray()
+        acc = 0
+        nb = 0
+        for x in a:
+            acc = (acc << 12) | (x & 0xFFF)
+            nb += 12
+            while nb >= 8:
+                nb -= 8
+                out.append((acc >> nb) & 0xFF)
+        return bytes(out)
+  gold: |
+    ```python
+    def byteencode12(a):
+        out = bytearray()
+        acc = 0
+        nb = 0
+        for x in a:
+            acc |= (x & 0xFFF) << nb
+            nb += 12
+            while nb >= 8:
+                out.append(acc & 0xFF)
+                acc >>= 8
+                nb -= 8
+        return bytes(out)
+    ```
+
+- id: dbg-implicit-reject-order
+  tier: debugging
+  type: code
+  tags: [ml-kem, decapsulation, bug]
+  checker: graders/checks/implicit_reject.py
+  prompt: |
+    This implicit-rejection function hashes the inputs in the wrong order. The
+    specification is K_bar = SHAKE256(z || c, 32). Fix it and return the full
+    corrected module (keep the name `implicit_reject`). One Python code block.
+
+    ```python
+    import hashlib
+    def implicit_reject(z, c):
+        return hashlib.shake_256(c + z).digest(32)
+    ```
+  buggy: |
+    import hashlib
+    def implicit_reject(z, c):
+        return hashlib.shake_256(c + z).digest(32)
+  gold: |
+    ```python
+    import hashlib
+    def implicit_reject(z, c):
+        return hashlib.shake_256(z + c).digest(32)
+    ```

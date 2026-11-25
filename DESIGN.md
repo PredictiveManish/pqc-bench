@@ -87,7 +87,7 @@ trace any fact to the document that states it, and re-verify dates cheaply.
 - **MCQ parsing** takes the last explicit answer marker; with several letters and
   no marker it returns `ambiguous` rather than guessing.
 - **Rubric keyword scoring** rewards mention, not correctness.
-- **44 tasks** is a skeleton, not a statistically robust eval.
+- **57 tasks** is a skeleton, not a statistically robust eval.
 
 ## 9. Roadmap
 

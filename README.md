@@ -51,7 +51,7 @@ python scripts/run_eval.py --provider sarvam --model sarvam-105b \
 Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 `standards,scenarios`), `--no-cache`, `--price-in/--price-out`.
 
-## What it measures (44 tasks)
+## What it measures (57 tasks)
 
 | Tier | What | Type | Ground truth |
 |---|---|---|---|
@@ -62,12 +62,18 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 | judgment | IoT signature choice, TLS KEM trade-off, FALCON risk | open | weighted rubric |
 | scenarios | India bank migration, SSH fleet, TLS PQ-signature gap, CNSA 2.0 firmware signing | open | weighted rubric + sources |
 
+**Repository tier:** three tasks run model output inside a fixture workspace —
+a crypto-audit discovery task, a patch task graded by the fixture's own
+`unittest` suite, and an ML-KEM-512 encapsulation task graded against fixed KAT
+vectors. Execution is process-isolated (temp cwd, scrubbed env, rlimits,
+`unshare -n` when permitted), not containerised.
+
 ## Why the numbers are trustworthy
 
 Four gates run before any model result counts (`make all`):
 
 1. **`scripts/validate_sources.py`** — every task has ≥1 real source URL
-   (44/44 tasks, 60 sources, verified 2026-11-25).
+   (57/57 tasks, 74 sources, verified 2026-11-25).
 2. **`scripts/validate_ground_truth.py`** — our zeta/compress formulas match
    `kyber-py` exactly, and ML-KEM-512/768/1024 and ML-DSA-44/65/87 round-trip at
    the standard's sizes. Checked against the real implementations.
@@ -118,7 +124,9 @@ fails.
 - **Code execution** is a resource-limited subprocess, not a security sandbox:
   environment secrets are scrubbed and rlimits applied, but it is not safe for
   hostile third-party submissions.
-- **44 tasks** is a solid skeleton, not a statistically robust eval.
+- **57 tasks** is a solid skeleton, not a statistically robust eval.
+- **Repository tasks** run in process-level isolation (temp cwd, scrubbed env,
+  rlimits, `unshare -n` when permitted), not a container.
 
 ## Scope and ethics
 

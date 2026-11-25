@@ -27,8 +27,8 @@ public, and not suitable for compliance claims.
 - [x] Benchmark-version hash covers prompts, task metadata, checker contents and
       the scorer implementation
 - [ ] Official ACVP / NIST KAT vectors — round-trip consistency is not conformance
-- [ ] Container or VM isolation for untrusted submissions (network off, read-only
-      filesystem, non-root)
+- [~] Process-level isolation only: temp cwd, scrubbed env, rlimits,
+      `unshare -n` when permitted. No filesystem namespace, no container.
 
 ### P1 — evidence quality
 
@@ -48,8 +48,12 @@ public, and not suitable for compliance claims.
 
 ### P3 — capability depth
 
-- [ ] Repository-level cryptographic discovery and CBOM generation
-- [ ] Migration patches graded by compile + test + interoperability
+- [x] Repository-level cryptographic discovery with precision/recall/F1 + evidence
+- [x] CycloneDX-style CBOM generation with schema validation
+- [x] Patch tasks graded by the fixture's own `unittest` suite
+- [x] Full-scheme KAT task (ML-KEM-512 encapsulation vs fixed vectors)
+- [ ] Migration patches graded by compile + interoperability across repos
+- [ ] Multi-language fixtures (Java/C++), which need those toolchains
 - [ ] Side-channel and constant-time challenges
 
 P3 is a different product (a *PQC-Migrate* agent benchmark), not an expansion of
@@ -57,7 +61,7 @@ this task list. Keep the two leaderboards separate.
 
 ## Known limitations, stated plainly
 
-- 30 of 44 tasks are multiple choice: this measures recall more than engineering.
+- 30 of 57 tasks are multiple choice (53%): recall-heavy, though code is now 15 tasks and repo-level work is 5.
 - The rubric scorer is keyword-based with a clause-scoped negation guard and
   criterion-level exclusions; it is a proxy, not a semantic evaluator.
 - Graders for Barrett/compress/zetas encode the reference formula themselves.

@@ -1,0 +1,4 @@
+signing:
+  algorithm: rsa-2048
+hashing:
+  algorithm: md5

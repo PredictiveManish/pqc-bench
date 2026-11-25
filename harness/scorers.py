@@ -24,6 +24,9 @@ def score(task: dict, output: str) -> dict:
         return _rubric(task, output)
     if t == "code":
         return _code(task, output)
+    if t == "repo":
+        from harness.repo_runner import grade as _repo_grade
+        return _repo_grade(task, output)
     return {"type": t, "score": 0.0, "error": f"unknown task type: {t}"}
 
 

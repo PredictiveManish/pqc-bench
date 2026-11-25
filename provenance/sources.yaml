@@ -98,6 +98,63 @@ tasks:
       - https://falcon-sign.info/
       - https://www.nist.gov/news-events/news/2024/08/announcing-approval-three-federal-information-processing-standards-fips
 
+  # ---- repository-level engineering ----
+  repo-discover-crypto:
+    basis: "Crypto hygiene: RSA key size, hardcoded secrets, weak hashes (NIST guidance)"
+    sources:
+      - https://csrc.nist.gov/pubs/sp/800/131/a/r2/final
+  repo-patch-crypto:
+    basis: "Remediation: RSA >= 2048 bits, secrets from env, SHA-256 for passwords"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+      - https://csrc.nist.gov/pubs/sp/800/131/a/r2/final
+  fullscheme-mlkem-encaps:
+    basis: "FIPS 203 ML-KEM encapsulation returns K directly (no KDF(K||H(c)) step)"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  repo-discover-indirect:
+    basis: "Cryptographic asset discovery incl. indirect usage (NIST CSWP 39 / CBOM practice)"
+    sources:
+      - https://csrc.nist.gov/pubs/cswp/39/cryptographic-agility-and-interoperability/final
+  repo-cbom:
+    basis: "CycloneDX cryptographic-asset schema for CBOM output"
+    sources:
+      - https://cyclonedx.org/capabilities/cbom/
+
+  # ---- engineering (implementation + debugging) ----
+  impl-cbd2:
+    basis: "FIPS 203 SamplePolyCBD with eta=2"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-byteencode12:
+    basis: "FIPS 203 ByteEncode_12"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-bytedecode12:
+    basis: "FIPS 203 ByteDecode_12"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-implicit-reject:
+    basis: "FIPS 203 implicit rejection K_bar = SHAKE256(z||c,32)"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-validate-ek:
+    basis: "FIPS 203 ML-KEM-768 encapsulation key length = 1184 bytes"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  dbg-cbd-swap:
+    basis: "FIPS 203 SamplePolyCBD bit ordering"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  dbg-byteencode-endian:
+    basis: "FIPS 203 ByteEncode_12 is little-endian"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  dbg-implicit-reject-order:
+    basis: "FIPS 203 implicit rejection hashes z then c"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+
   # ---- scenarios ----
   scen-india-bank-migration:
     basis: "India DST/NQM Task Force timelines; TEC 910018:2025; CERT-In CBOM/QBOM"
