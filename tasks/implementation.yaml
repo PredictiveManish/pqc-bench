@@ -1,0 +1,118 @@
+# PQC-Eval — implementation tier (code, graded against reference behaviour)
+# `checker` is a path (relative to repo root) to a module exposing check(mod).
+
+- id: impl-compress
+  tier: implementation
+  type: code
+  tags: [ml-kem, compression]
+  checker: graders/checks/compress.py
+  prompt: |
+    FIPS 203 (ML-KEM) defines, for q = 3329 and 0 <= x < q:
+
+        Compress_d(x)   = round( (2^d / q) * x )  mod 2^d
+        Decompress_d(y) = round( (q / 2^d) * y )
+
+    Implement two module-level Python functions:
+
+        compress_d(x: int, d: int) -> int
+        decompress_d(y: int, d: int) -> int
+
+    They must match the specification exactly for d in {1, 4, 10, 11}.
+    Return a single Python code block containing only these functions.
+    Do not print anything.
+  gold: |
+    ```python
+    Q = 3329
+
+    def compress_d(x, d):
+        return (((x << d) + Q // 2) // Q) & ((1 << d) - 1)
+
+    def decompress_d(y, d):
+        return (y * Q + (1 << (d - 1))) >> d
+    ```
+
+- id: impl-bitrev7
+  tier: implementation
+  type: code
+  tags: [ml-kem, ntt]
+  checker: graders/checks/bitrev.py
+  prompt: |
+    ML-KEM uses BitRev7(i): reverse the 7-bit binary representation of the index i,
+    for 0 <= i < 128. For example BitRev7(1) = 64 and BitRev7(3) = 96.
+
+    Implement a module-level Python function:
+
+        bitrev7(i: int) -> int
+
+    Return a single Python code block containing only this function.
+  gold: |
+    ```python
+    def bitrev7(i):
+        r = 0
+        for b in range(7):
+            r |= ((i >> b) & 1) << (6 - b)
+        return r
+    ```
+
+- id: impl-zetas
+  tier: implementation
+  type: code
+  tags: [ml-kem, ntt, constants]
+  checker: graders/checks/zetas.py
+  prompt: |
+    ML-KEM's number-theoretic transform uses the 128-entry table
+
+        zetas[i] = 17^BitRev7(i) mod 3329,   i = 0 .. 127
+
+    where BitRev7 reverses the 7-bit representation of i.
+
+    Implement a module-level function:
+
+        zetas() -> list[int]
+
+    returning this list of 128 integers. Return a single Python code block.
+  gold: |
+    ```python
+    Q = 3329
+
+    def bitrev7(i):
+        r = 0
+        for b in range(7):
+            r |= ((i >> b) & 1) << (6 - b)
+        return r
+
+    def zetas():
+        return [pow(17, bitrev7(i), Q) for i in range(128)]
+    ```
+
+- id: impl-barrett
+  tier: implementation
+  type: code
+  tags: [ml-kem, modular-reduction]
+  checker: graders/checks/barrett.py
+  prompt: |
+    ML-KEM uses Barrett reduction with q = 3329 to map an integer a to the
+    representative congruent to a mod q in the range (-q/2, q/2]. The standard
+    routine is:
+
+        v = ((1 << 26) + q // 2) // q
+        t = (v * a + (1 << 25)) >> 26
+        t *= q
+        return a - t
+
+    Implement a module-level Python function:
+
+        barrett_reduce(a: int) -> int
+
+    matching this routine exactly (including for negative a).
+    Return a single Python code block.
+  gold: |
+    ```python
+    Q = 3329
+
+    def barrett_reduce(a):
+        v = ((1 << 26) + Q // 2) // Q
+        t = (v * a + (1 << 25)) >> 26
+        t *= Q
+        return a - t
+    ```

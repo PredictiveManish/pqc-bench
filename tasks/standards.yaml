@@ -1,0 +1,288 @@
+# PQC-Eval — standards & conformance tier
+# Real-world regulatory facts, each traced in provenance/sources.yaml.
+# Verified 2026-11-25.
+
+- id: std-nist-disallow
+  tier: standards
+  type: mcq
+  tags: [nist, ir-8547, timeline]
+  prompt: |
+    Under NIST IR 8547 (final, October 2026), when will quantum-vulnerable
+    public-key cryptography be disallowed under NIST standards and guidelines?
+    Answer with the single letter only.
+
+    A) After 2030
+    B) After 2035
+    C) Immediately
+    D) After 2040
+  answer: B
+  gold: "B"
+  explain: Deprecated after 2030; disallowed after 2035. Accelerated federal deadlines apply earlier to high-value assets.
+
+- id: std-nist-hva
+  tier: standards
+  type: mcq
+  tags: [nist, eo-14412, timeline]
+  prompt: |
+    Under the accelerated US federal schedule (EO 14412 / OMB M-26-15), high-value
+    assets must adopt post-quantum key establishment by which date?
+    Answer with the single letter only.
+
+    A) 31 December 2028
+    B) 31 December 2030
+    C) 31 December 2033
+    D) 31 December 2035
+  answer: B
+  gold: "B"
+  explain: Key establishment by 31 Dec 2030, signatures by 31 Dec 2031, per IR 8547.
+
+- id: std-cnsa-kem
+  tier: standards
+  type: mcq
+  tags: [cnsa-2.0, nsa, parameters]
+  prompt: |
+    Which parameter set does NSA's CNSA 2.0 require for key establishment?
+    Answer with the single letter only.
+
+    A) ML-KEM-512
+    B) ML-KEM-768
+    C) ML-KEM-1024
+    D) X25519 alone
+  answer: C
+  gold: "C"
+  explain: CNSA 2.0 names the top parameter sets — ML-KEM-1024 and ML-DSA-87.
+
+- id: std-cnsa-firmware
+  tier: standards
+  type: mcq
+  tags: [cnsa-2.0, firmware-signing, sp-800-208]
+  prompt: |
+    CNSA 2.0 requires which algorithms for software and firmware signing?
+    Answer with the single letter only.
+
+    A) ML-DSA-87
+    B) SLH-DSA
+    C) LMS / XMSS (NIST SP 800-208)
+    D) RSA-PSS
+  answer: C
+  gold: "C"
+  explain: Stateful hash-based LMS/XMSS from SP 800-208; these require state management and hardware signing.
+
+- id: std-cnsa-browser
+  tier: standards
+  type: mcq
+  tags: [cnsa-2.0, timeline]
+  prompt: |
+    By which year must web browsers and servers exclusively use CNSA 2.0
+    algorithms?
+    Answer with the single letter only.
+
+    A) 2027
+    B) 2030
+    C) 2033
+    D) 2035
+  answer: C
+  gold: "C"
+  explain: Browsers/servers/cloud/OS exclusive CNSA 2.0 by 2033; networking equipment and signing by 2030.
+
+- id: std-tls-codepoint
+  tier: standards
+  type: mcq
+  tags: [tls, deployment, hybrid]
+  prompt: |
+    Which TLS codepoint identifies the hybrid key agreement X25519MLKEM768?
+    Answer with the single letter only.
+
+    A) 0x6399
+    B) 0x11ec
+    C) 0x1301
+    D) 0x001d
+  answer: B
+  gold: "B"
+  explain: 0x11ec is X25519MLKEM768; 0x6399 is the obsolete X25519Kyber768Draft00.
+
+- id: std-openssh-default
+  tier: standards
+  type: mcq
+  tags: [openssh, deployment]
+  prompt: |
+    In which OpenSSH release did mlkem768x25519-sha256 become the default key
+    exchange algorithm?
+    Answer with the single letter only.
+
+    A) 9.0
+    B) 9.9
+    C) 10.0
+    D) 10.1
+  answer: C
+  gold: "C"
+  explain: Added in 9.9 (Sep 2024), default in 10.0 (Apr 2025); 10.1 warns on non-PQ KEX.
+
+- id: std-uk-ncsc-2028
+  tier: standards
+  type: mcq
+  tags: [ncsc, uk, timeline]
+  prompt: |
+    Per UK NCSC migration timelines, what should organisations have completed
+    by 2028?
+    Answer with the single letter only.
+
+    A) Full migration to PQC
+    B) Discovery and an initial migration plan
+    C) Standalone post-quantum signatures everywhere
+    D) Retirement of all RSA keys
+  answer: B
+  gold: "B"
+  explain: 2028 discovery + plan; 2031 highest-priority migration; 2035 complete.
+
+- id: std-anssi-hybrid
+  tier: standards
+  type: mcq
+  tags: [anssi, france, hybrid]
+  prompt: |
+    In ANSSI's post-quantum transition roadmap, how should post-quantum
+    algorithms be used during phases 1 and 2?
+    Answer with the single letter only.
+
+    A) Optionally and standalone
+    B) Mandatorily in hybrid with a classical algorithm
+    C) Not at all
+    D) Only for signatures
+  answer: B
+  gold: "B"
+  explain: ANSSI requires hybridation in phases 1-2; standalone PQC optional only from phase 3 (~2030).
+
+- id: std-bsi-keyagreement
+  tier: standards
+  type: mcq
+  tags: [bsi, germany, timeline]
+  prompt: |
+    Per BSI TR-02102-1 (2026), until when does BSI recommend classical asymmetric
+    key agreement on its own (i.e. not hybrid)?
+    Answer with the single letter only.
+
+    A) End of 2031 (end of 2030 for highest-sensitivity use)
+    B) End of 2035
+    C) End of 2028
+    D) There is no limit
+  answer: A
+  gold: "A"
+  explain: "BSI: classical key agreement alone only to end 2031 (2030 highest-sensitivity); signatures to end 2035."
+
+- id: std-india-certin-cbom
+  tier: standards
+  type: mcq
+  tags: [india, cert-in, cbom]
+  prompt: |
+    CERT-In's Technical Guidelines on SBOM/QBOM/CBOM (v2.0, July 2025) require
+    organisations to do which of the following?
+    Answer with the single letter only.
+
+    A) Publish their algorithms publicly
+    B) Maintain Cryptographic and Quantum Bills of Materials (CBOM/QBOM)
+    C) Use only indigenous algorithms
+    D) Disable TLS 1.3
+  answer: B
+  gold: "B"
+  explain: CBOM/QBOM inventories, supplier-provided, aligned with NIST/ETSI.
+
+- id: std-india-tec-framework
+  tier: standards
+  type: mcq
+  tags: [india, tec, certification]
+  prompt: |
+    India's TEC-led framework (TEC 910018:2025 and the DST/NQM Task Force) for
+    PQC establishes what?
+    Answer with the single letter only.
+
+    A) An immediate ban on RSA
+    B) A national testing and certification program with assurance levels L1-L4
+    C) A QKD-only mandate
+    D) A proprietary algorithm suite
+  answer: B
+  gold: "B"
+  explain: National PQC testing/certification with L1-L4 assurance levels; Tier-1/2 labs targeted by Dec 2026.
+
+- id: std-india-cii-timeline
+  tier: standards
+  type: mcq
+  tags: [india, dst, timeline]
+  prompt: |
+    Per India's DST/National Quantum Mission Task Force, by which year should
+    CII (critical information infrastructure) sectors reach full PQC adoption?
+    Answer with the single letter only.
+
+    A) 2027
+    B) 2028
+    C) 2029
+    D) 2033
+  answer: C
+  gold: "C"
+  explain: "CII: 2027 foundations, 2028 high priority, 2029 full adoption; other enterprises 2028/2030/2033."
+
+- id: std-hqc-role
+  tier: standards
+  type: mcq
+  tags: [hqc, nist, kem]
+  prompt: |
+    NIST selected HQC in March 2025 for which role?
+    Answer with the single letter only.
+
+    A) To replace ML-KEM as the primary KEM
+    B) A backup KEM based on error-correcting codes, as a hedge against ML-KEM weakness
+    C) A new signature scheme
+    D) A hash function
+  answer: B
+  gold: "B"
+  explain: HQC is code-based (different math from ML-KEM); final standard expected ~2027.
+
+- id: std-pq3-level
+  tier: standards
+  type: mcq
+  tags: [apple, pq3, deployment]
+  prompt: |
+    Apple describes iMessage PQ3 as reaching which security "level" (Apple's
+    own framing)?
+    Answer with the single letter only.
+
+    A) Level 1
+    B) Level 2
+    C) Level 3
+    D) Level 4
+  answer: C
+  gold: "C"
+  explain: PQ3 secures initial key establishment and ongoing rekeying; Apple calls it Level 3.
+
+- id: std-signal-kem
+  tier: standards
+  type: mcq
+  tags: [signal, pqxdh, deployment]
+  prompt: |
+    Signal's PQXDH protocol combines X25519 with which key encapsulation
+    mechanism?
+    Answer with the single letter only.
+
+    A) NTRU
+    B) CRYSTALS-Kyber
+    C) Classic McEliece
+    D) HQC
+  answer: B
+  gold: "B"
+  explain: PQXDH (Sep 2023) combines X25519 and Kyber; an attacker must break both.
+
+- id: std-pq-sig-adoption
+  tier: standards
+  type: mcq
+  tags: [deployment, measurement, tls]
+  prompt: |
+    According to the 2026 IMC large-scale TLS measurement, roughly what share of
+    observed domains used post-quantum *signature* algorithms?
+    Answer with the single letter only.
+
+    A) 0%
+    B) 25%
+    C) 50%
+    D) 90%
+  answer: A
+  gold: "A"
+  explain: ~49% used PQ key exchange (all X25519MLKEM768) but PQ signature adoption was ~0%.

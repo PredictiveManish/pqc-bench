@@ -1,0 +1,125 @@
+# PQC-Eval — judgment tier (open response, weighted rubric)
+# v0 scoring is keyword coverage + must_not penalties. See DESIGN.md for the
+# upgrade path to an LLM-judge with a human-calibrated rubric.
+
+- id: judge-iot-signature
+  tier: judgment
+  type: rubric
+  tags: [ml-dsa, slh-dsa, engineering-tradeoff]
+  prompt: |
+    You must add digital signatures to a battery-powered sensor that sends small
+    (~200 byte) telemetry frames over a low-bandwidth LoRa link. Compare
+    ML-DSA-44 and SLH-DSA-128s and recommend one, with reasoning.
+  rubric:
+    - id: recommends-ml-dsa
+      desc: recommends ML-DSA-44 (or a clearly reasoned equivalent)
+      weight: 1
+      match_any: ["ml-dsa-44", "dilithium"]
+    - id: quantifies-size
+      desc: quantifies the signature-size gap (ML-DSA ~2.4KB vs SLH-DSA ~7.9KB)
+      weight: 1
+      match_any: ["2.4", "2420", "7.9", "7856", "signature size", "kb"]
+    - id: notes-hash-only
+      desc: notes SLH-DSA relies only on hash security (most conservative)
+      weight: 1
+      match_any: ["hash security", "only on hash", "conservative", "minimal assumption"]
+    - id: considers-constraint
+      desc: weighs bandwidth/energy of the constrained link
+      weight: 1
+      match_any: ["bandwidth", "energy", "lora", "constrained", "power"]
+    - id: acknowledges-assumption-gap
+      desc: acknowledges lattice assumptions are less conservative than hash-only
+      weight: 1
+      match_any: ["less conservative", "lattice assumption", "module-lattice", "best-studied", "well-studied"]
+  must_not:
+    - ["slh-dsa is lattice", "sphincs+ is lattice", "slh-dsa uses lattices"]
+  gold: |
+    Recommend ML-DSA-44 (Dilithium). Its signatures are about 2.4 KB, while
+    SLH-DSA-128s signatures are roughly 7.9 KB; on a 200-byte LoRa frame the extra
+    bandwidth and energy cost of SLH-DSA is significant for a battery-powered
+    sensor. ML-DSA rests on module-lattice assumptions, which are less conservative
+    than SLH-DSA's reliance only on hash security, but the lattice assumptions
+    behind ML-KEM and ML-DSA are the best-studied post-quantum assumptions and are
+    deployed at scale. If bandwidth were abundant I would pick SLH-DSA for its
+    minimal assumptions; here bandwidth and energy dominate. Both need constant-time
+    implementation care.
+
+- id: judge-tls-kem
+  tier: judgment
+  type: rubric
+  tags: [ml-kem, mceliece, deployment-tradeoff]
+  prompt: |
+    A large e-commerce site is choosing a KEM for TLS 1.3. Compare ML-KEM-768
+    against Classic McEliece and recommend one, considering real deployment.
+  rubric:
+    - id: recommends-mlkem-or-hybrid
+      desc: recommends ML-KEM-768 or a hybrid containing it
+      weight: 1
+      match_any: ["ml-kem-768", "hybrid"]
+    - id: notes-mceliece-size
+      desc: notes Classic McEliece's very large public key (~1 MB)
+      weight: 1
+      match_any: ["mceliece", "1 mb", "megabyte", "large public key", "huge key"]
+    - id: notes-handshake-impact
+      desc: explains handshake/certificate bandwidth impact
+      weight: 1
+      match_any: ["handshake", "certificate", "bandwidth", "size"]
+    - id: hybrid-rationale
+      desc: explains hybrid rationale (classical + quantum security)
+      weight: 1
+      match_any: ["hybrid", "classical security", "x25519"]
+    - id: notes-mceliece-conservative
+      desc: acknowledges McEliece is more conservative (code-based, decades of study)
+      weight: 1
+      match_any: ["conservative", "code-based", "decades"]
+  must_not:
+    - ["mceliece has small keys", "ml-kem is broken"]
+  gold: |
+    Recommend a hybrid of X25519 and ML-KEM-768 for TLS 1.3. ML-KEM-768 has a
+    ~1.2 KB encapsulation key and ~1.1 KB ciphertext, which fits comfortably in a
+    TLS handshake. Classic McEliece has a public key around 1 MB, which bloats the
+    handshake and any certificate carrying it and is impractical at e-commerce
+    scale. McEliece is more conservative — code-based, with decades of study — but
+    its key size rules it out for mass TLS. Running the hybrid keeps classical
+    security if ML-KEM is later broken while adding quantum security; the added
+    bytes are modest.
+
+- id: judge-falcon-risk
+  tier: judgment
+  type: rubric
+  tags: [fn-dsa, implementation-risk]
+  prompt: |
+    Your team must ship a PQC signature scheme. A colleague proposes FALCON/FN-DSA
+    because its signatures are the smallest. What implementation risks should you
+    weigh before agreeing, and what would you recommend?
+  rubric:
+    - id: floating-point
+      desc: identifies floating-point FFT sampling
+      weight: 1
+      match_any: ["floating-point", "floating point", "fft"]
+    - id: side-channel
+      desc: raises constant-time / side-channel difficulty
+      weight: 1
+      match_any: ["gaussian", "sampling", "side-channel", "side channel", "constant-time"]
+    - id: determinism
+      desc: notes cross-platform non-determinism / portability risk
+      weight: 1
+      match_any: ["determinism", "non-determinism", "platform", "portability"]
+    - id: alternative
+      desc: notes ML-DSA is simpler to implement safely
+      weight: 1
+      match_any: ["ml-dsa", "dilithium", "simpler"]
+    - id: mitigation
+      desc: recommends a vetted reference implementation and/or audit
+      weight: 1
+      match_any: ["vetted", "review", "audit", "reference implementation"]
+  must_not:
+    - ["falcon is easy to implement", "no side-channel risk"]
+  gold: |
+    FN-DSA (FALCON) does give the smallest signatures, but the cost is
+    implementation risk. It relies on floating-point FFT Gaussian sampling, and
+    making that constant-time is notoriously hard; floating-point non-determinism
+    across platforms also threatens reproducibility. These factors raise the risk of
+    side-channel leakage and correctness bugs. ML-DSA is simpler to implement
+    safely, at the cost of larger signatures. I would only agree to FN-DSA with a
+    well-vetted reference implementation and an independent side-channel audit.

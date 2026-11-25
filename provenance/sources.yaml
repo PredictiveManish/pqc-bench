@@ -1,0 +1,200 @@
+# PQC-Eval provenance registry
+# Maps every task id to the primary source(s) its content is based on.
+# `scripts/validate_sources.py` fails if any task is missing here or lacks a URL.
+# Verified 2026-11-25.
+
+verified: "2026-11-25"
+
+tasks:
+  # ---- knowledge ----
+  know-mlkem-basis:
+    basis: "FIPS 203 abstract: ML-KEM security relates to Module-LWE"
+    sources:
+      - https://csrc.nist.gov/pubs/fips/203/final
+  know-mlkem-768-eksize:
+    basis: "FIPS 203 parameter sets and key/ciphertext sizes"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  know-fips-number:
+    basis: "FIPS 204 specifies ML-DSA (Federal Register notice)"
+    sources:
+      - https://www.federalregister.gov/documents/2024/08/14/2024-17956/announcing-issuance-of-federal-information-processing-standards-fips-fips-203-module-lattice-based
+  know-slhdsa-basis:
+    basis: "FIPS 205: SLH-DSA is stateless hash-based"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/fips/NIST.FIPS.205.pdf
+  know-sike-break:
+    basis: "Castryck-Decru 2022 key-recovery attack on SIDH/SIKE"
+    sources:
+      - https://eprint.iacr.org/2022/975
+  know-rainbow-break:
+    basis: "Beullens 2022 'Breaking Rainbow Takes a Weekend on a Laptop'"
+    sources:
+      - https://eprint.iacr.org/2022/214
+  know-kyberslash:
+    basis: "KyberSlash: secret-dependent division timing issue in some implementations"
+    sources:
+      - https://kyberslash.cr.yp.to/
+  know-falcon-hard:
+    basis: "FALCON/FN-DSA uses floating-point FFT Gaussian sampling"
+    sources:
+      - https://falcon-sign.info/
+  know-hybrid-why:
+    basis: "Hybrid key exchange rationale (X25519 + ML-KEM) in real deployments"
+    sources:
+      - https://developers.cloudflare.com/ssl/post-quantum-cryptography/
+      - https://signal.org/blog/pqxdh/
+  know-mlkem-512-level:
+    basis: "FIPS 203: ML-KEM-512 targets NIST category 1"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+
+  # ---- implementation ----
+  impl-compress:
+    basis: "FIPS 203 Compress_d / Decompress_d definitions"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-bitrev7:
+    basis: "FIPS 203 BitRev7 used by the NTT"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-zetas:
+    basis: "FIPS 203 NTT zeta table zetas[i] = 17^BitRev7(i) mod 3329"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  impl-barrett:
+    basis: "FIPS 203 BarrettReduce with q = 3329"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+
+  # ---- debugging ----
+  dbg-barrett-rounding:
+    basis: "FIPS 203 BarrettReduce rounding term"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  dbg-compress-floor:
+    basis: "FIPS 203 Compress_d uses rounding, not truncation"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+  dbg-invntt-scaling:
+    basis: "FIPS 203 inverse NTT includes final scaling by 128^-1 mod q"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
+
+  # ---- judgment ----
+  judge-iot-signature:
+    basis: "FIPS 204 (ML-DSA) vs FIPS 205 (SLH-DSA) signature sizes and assumptions"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf
+      - https://nvlpubs.nist.gov/nistpubs/fips/NIST.FIPS.205.pdf
+  judge-tls-kem:
+    basis: "ML-KEM deployment in TLS; Classic McEliece not selected (NIST IR 8545)"
+    sources:
+      - https://developers.cloudflare.com/ssl/post-quantum-cryptography/
+      - https://nvlpubs.nist.gov/nistpubs/ir/2025/NIST.IR.8545.pdf
+  judge-falcon-risk:
+    basis: "FN-DSA floating-point sampling; FIPS 206 still in development"
+    sources:
+      - https://falcon-sign.info/
+      - https://www.nist.gov/news-events/news/2024/08/announcing-approval-three-federal-information-processing-standards-fips
+
+  # ---- scenarios ----
+  scen-india-bank-migration:
+    basis: "India DST/NQM Task Force timelines; TEC 910018:2025; CERT-In CBOM/QBOM"
+    sources:
+      - https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
+      - https://tec.gov.in/pdf/TR/Final%20technical%20report%20on%20migration%20to%20PQC%2028-03-25.pdf
+      - https://cert-in.org.in/PDF/TechnicalGuidelines-on-SBOM,QBOM&CBOM,AIBOM_and_HBOM_ver2.0.pdf
+  scen-ssh-fleet:
+    basis: "OpenSSH 9.9/10.0 post-quantum KEX defaults"
+    sources:
+      - https://www.openssh.org/txt/release-9.9
+      - https://www.openssh.org/txt/release-10.0
+      - https://www.openssh.org/pq.html
+  scen-tls-gap:
+    basis: "IMC 2026 measurement: PQ key exchange ~49%, PQ signatures ~0%"
+    sources:
+      - https://cacm.acm.org/news/post-quantum-tls-finished-the-easy-half/
+      - https://developers.cloudflare.com/ssl/post-quantum-cryptography/
+  scen-firmware-signing:
+    basis: "CNSA 2.0 requires LMS/XMSS (SP 800-208) for firmware signing"
+    sources:
+      - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
+      - https://csrc.nist.gov/pubs/sp/800/208/final
+
+  # ---- standards ----
+  std-nist-disallow:
+    basis: "NIST IR 8547: deprecate after 2030, disallow after 2035"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/ir/2026/NIST.IR.8547.pdf
+  std-nist-hva:
+    basis: "IR 8547 / EO 14412: high-value assets key establishment by 31 Dec 2030"
+    sources:
+      - https://nvlpubs.nist.gov/nistpubs/ir/2026/NIST.IR.8547.pdf
+  std-cnsa-kem:
+    basis: "CNSA 2.0 requires ML-KEM-1024 for key establishment"
+    sources:
+      - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
+  std-cnsa-firmware:
+    basis: "CNSA 2.0 firmware/software signing uses LMS/XMSS (SP 800-208)"
+    sources:
+      - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
+  std-cnsa-browser:
+    basis: "CNSA 2.0: browsers/servers exclusive use by 2033"
+    sources:
+      - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
+      - https://pqcstatus.com/articles/cnsa-2-0-timeline/
+  std-tls-codepoint:
+    basis: "X25519MLKEM768 = TLS codepoint 0x11ec"
+    sources:
+      - https://developers.cloudflare.com/ssl/post-quantum-cryptography/
+      - https://security.googleblog.com/2024/09/a-new-path-for-kyber-on-the-web.html
+  std-openssh-default:
+    basis: "mlkem768x25519-sha256 default in OpenSSH 10.0"
+    sources:
+      - https://www.openssh.org/txt/release-10.0
+      - https://www.openssh.org/pq.html
+  std-uk-ncsc-2028:
+    basis: "NCSC: discovery + initial plan by 2028"
+    sources:
+      - https://www.ncsc.gov.uk/guidance/pqc-migration-timelines
+  std-anssi-hybrid:
+    basis: "ANSSI: hybrid mandatory in phases 1-2"
+    sources:
+      - https://messervices.cyber.gouv.fr/documents-guides/EN_Position.pdf
+  std-bsi-keyagreement:
+    basis: "BSI TR-02102-1: classical key agreement alone to end 2031 (2030 highest)"
+    sources:
+      - https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR02102/BSI-TR-02102.pdf?__blob=publicationFile
+      - https://www.bsi.bund.de/DE/Service-Navi/Presse/Pressemitteilungen/Presse2026/260211_Ende_klassischer_Verschluesselungsverfahren.html
+  std-india-certin-cbom:
+    basis: "CERT-In v2.0 guidelines require CBOM/QBOM"
+    sources:
+      - https://cert-in.org.in/PDF/TechnicalGuidelines-on-SBOM,QBOM&CBOM,AIBOM_and_HBOM_ver2.0.pdf
+  std-india-tec-framework:
+    basis: "TEC/DST framework: national PQC testing & certification, L1-L4"
+    sources:
+      - https://tec.gov.in/pdf/TR/Final%20technical%20report%20on%20migration%20to%20PQC%2028-03-25.pdf
+      - https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
+  std-india-cii-timeline:
+    basis: "DST/NQM: CII full PQC adoption by 2029"
+    sources:
+      - https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
+      - https://www.thehindu.com/news/national/critical-sectors-must-have-quantum-safe-encryption-urges-task-force/article71029610.ece
+  std-hqc-role:
+    basis: "NIST selected HQC as backup code-based KEM (Mar 2025)"
+    sources:
+      - https://www.nist.gov/news-events/news/2025/03/nist-selects-hqc-fifth-algorithm-post-quantum-encryption
+      - https://nvlpubs.nist.gov/nistpubs/ir/2025/NIST.IR.8545.pdf
+  std-pq3-level:
+    basis: "Apple iMessage PQ3 described as Level 3 security"
+    sources:
+      - https://security.apple.com/blog/imessage-pq3/
+  std-signal-kem:
+    basis: "Signal PQXDH combines X25519 with CRYSTALS-Kyber"
+    sources:
+      - https://signal.org/blog/pqxdh/
+  std-pq-sig-adoption:
+    basis: "IMC 2026: ~0% post-quantum signature adoption observed"
+    sources:
+      - https://cacm.acm.org/news/post-quantum-tls-finished-the-easy-half/

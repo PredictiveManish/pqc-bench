@@ -1,0 +1,907 @@
+{
+  "model": "null-model",
+  "k": 1,
+  "temperature": 0.0,
+  "duration_s": 0.64,
+  "usage": {
+    "calls": 41,
+    "cache_hits": 0,
+    "errors": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0
+  },
+  "est_cost_usd": null,
+  "summary": {
+    "n": 41,
+    "overall_mean_score": 0.0,
+    "overall_pass_rate": 0.0,
+    "by_tier": {
+      "debugging": {
+        "n": 3,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "implementation": {
+        "n": 4,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "judgment": {
+        "n": 3,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "knowledge": {
+        "n": 10,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "scenarios": {
+        "n": 4,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "standards": {
+        "n": 17,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      }
+    },
+    "by_type": {
+      "code": {
+        "n": 7,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "mcq": {
+        "n": 27,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      },
+      "rubric": {
+        "n": 7,
+        "mean_score": 0.0,
+        "pass_rate": 0.0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "dbg-barrett-rounding",
+      "tier": "debugging",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmpwan2p5ap\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "dbg-compress-floor",
+      "tier": "debugging",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmpo03osrea\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "dbg-invntt-scaling",
+      "tier": "debugging",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmpat_pb4ty\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "impl-compress",
+      "tier": "implementation",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmpulvjjbca\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "impl-bitrev7",
+      "tier": "implementation",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmph9x4w06f\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "impl-zetas",
+      "tier": "implementation",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmp67rkby1q\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "impl-barrett",
+      "tier": "implementation",
+      "type": "code",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 0.0,
+          "ok": false,
+          "error": "import failed: SyntaxError('unterminated string literal (detected at line 1)', ('C:\\\\Users\\\\manis\\\\AppData\\\\Local\\\\Temp\\\\tmpey69urku\\\\submission.py', 1, 6, \"I don't know.\", 1, 6))",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "judge-iot-signature",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "recommends-ml-dsa",
+              "hit": false
+            },
+            {
+              "id": "quantifies-size",
+              "hit": false
+            },
+            {
+              "id": "notes-hash-only",
+              "hit": false
+            },
+            {
+              "id": "considers-constraint",
+              "hit": false
+            },
+            {
+              "id": "acknowledges-assumption-gap",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "judge-tls-kem",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "recommends-mlkem-or-hybrid",
+              "hit": false
+            },
+            {
+              "id": "notes-mceliece-size",
+              "hit": false
+            },
+            {
+              "id": "notes-handshake-impact",
+              "hit": false
+            },
+            {
+              "id": "hybrid-rationale",
+              "hit": false
+            },
+            {
+              "id": "notes-mceliece-conservative",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "judge-falcon-risk",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "floating-point",
+              "hit": false
+            },
+            {
+              "id": "side-channel",
+              "hit": false
+            },
+            {
+              "id": "determinism",
+              "hit": false
+            },
+            {
+              "id": "alternative",
+              "hit": false
+            },
+            {
+              "id": "mitigation",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-basis",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-768-eksize",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-fips-number",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-slhdsa-basis",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-sike-break",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-rainbow-break",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "A",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-kyberslash",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-falcon-hard",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-hybrid-why",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-512-level",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "A",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "scen-india-bank-migration",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "cites-tec",
+              "hit": false
+            },
+            {
+              "id": "cites-timeline",
+              "hit": false
+            },
+            {
+              "id": "cites-cbom",
+              "hit": false
+            },
+            {
+              "id": "assume-breach",
+              "hit": false
+            },
+            {
+              "id": "first-step",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "scen-ssh-fleet",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "explains-default",
+              "hit": false
+            },
+            {
+              "id": "mlkem",
+              "hit": false
+            },
+            {
+              "id": "hybrid-reason",
+              "hit": false
+            },
+            {
+              "id": "action",
+              "hit": false
+            },
+            {
+              "id": "warning",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "scen-tls-gap",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "kex-vs-sig",
+              "hit": false
+            },
+            {
+              "id": "x25519mlkem",
+              "hit": false
+            },
+            {
+              "id": "why-sig-hard",
+              "hit": false
+            },
+            {
+              "id": "hndl-scope",
+              "hit": false
+            },
+            {
+              "id": "action",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "scen-firmware-signing",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 0.0,
+          "raw_coverage": 0.0,
+          "matched": [
+            {
+              "id": "names-lms-xmss",
+              "hit": false
+            },
+            {
+              "id": "stateful",
+              "hit": false
+            },
+            {
+              "id": "hardware",
+              "hit": false
+            },
+            {
+              "id": "contrast",
+              "hit": false
+            },
+            {
+              "id": "timeline",
+              "hit": false
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-nist-disallow",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-nist-hva",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-kem",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-firmware",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-browser",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-tls-codepoint",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-openssh-default",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-uk-ncsc-2028",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-anssi-hybrid",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-bsi-keyagreement",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "A",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-india-certin-cbom",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-india-tec-framework",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-india-cii-timeline",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-hqc-role",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-pq3-level",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "C",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-signal-kem",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "B",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    },
+    {
+      "id": "std-pq-sig-adoption",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 0.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 0.0,
+          "correct": false,
+          "predicted": null,
+          "expected": "A",
+          "status": "call",
+          "output": "I don't know."
+        }
+      ]
+    }
+  ]
+}

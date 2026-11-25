@@ -1,0 +1,166 @@
+# PQC-Eval — knowledge tier (multiple choice)
+# Each task: id, tier, type, tags, prompt, choices, answer, gold, explain
+# `gold` is the self-test oracle answer, not a hint shown to models.
+
+- id: know-mlkem-basis
+  tier: knowledge
+  type: mcq
+  tags: [ml-kem, security-basis]
+  prompt: |
+    ML-KEM (FIPS 203) derives its security from which computational problem?
+    Answer with the single letter only.
+
+    A) Integer factorisation
+    B) Module Learning With Errors (Module-LWE)
+    C) Decoding random linear codes
+    D) Supersingular isogeny problems
+  answer: B
+  gold: "B"
+  explain: ML-KEM is lattice-based, built on Module-LWE over R_q = Z_q[X]/(X^256+1) with q=3329.
+
+- id: know-mlkem-768-eksize
+  tier: knowledge
+  type: mcq
+  tags: [ml-kem, parameters, sizes]
+  prompt: |
+    What is the encapsulation (public) key size of ML-KEM-768, in bytes?
+    Answer with the single letter only.
+
+    A) 800
+    B) 1184
+    C) 1568
+    D) 2400
+  answer: B
+  gold: "B"
+  explain: ML-KEM-768 ek = 1184 bytes, dk = 2400, ciphertext = 1088.
+
+- id: know-fips-number
+  tier: knowledge
+  type: mcq
+  tags: [standards, ml-dsa]
+  prompt: |
+    Which FIPS standard specifies ML-DSA (the Dilithium signature scheme)?
+    Answer with the single letter only.
+
+    A) FIPS 203
+    B) FIPS 204
+    C) FIPS 205
+    D) FIPS 206
+  answer: B
+  gold: "B"
+  explain: FIPS 203 = ML-KEM, 204 = ML-DSA, 205 = SLH-DSA, 206 = FN-DSA (draft).
+
+- id: know-slhdsa-basis
+  tier: knowledge
+  type: mcq
+  tags: [slh-dsa, security-basis]
+  prompt: |
+    SLH-DSA (SPHINCS+, FIPS 205) bases its security on which assumption?
+    Answer with the single letter only.
+
+    A) Module-LWE
+    B) Hardness of decoding random linear codes
+    C) Only the security of an underlying hash function
+    D) NTRU lattice problems
+  answer: C
+  gold: "C"
+  explain: SLH-DSA is stateless hash-based; its security reduces to hash-function properties.
+
+- id: know-sike-break
+  tier: knowledge
+  type: mcq
+  tags: [isogeny, attacks, history]
+  prompt: |
+    SIKE (an isogeny-based KEM) was broken in 2022. Which class of attack did it?
+    Answer with the single letter only.
+
+    A) Lattice reduction (BKZ)
+    B) A torsion-point / glue-and-split attack on SIDH
+    C) Grover's quantum search
+    D) Differential fault analysis
+  answer: B
+  gold: "B"
+  explain: Castryck-Decru (2022) used the SIDH torsion-point images to recover keys.
+
+- id: know-rainbow-break
+  tier: knowledge
+  type: mcq
+  tags: [multivariate, attacks, history]
+  prompt: |
+    Rainbow (a multivariate signature scheme) was broken in 2022 by Beullens.
+    What was the core of the attack?
+    Answer with the single letter only.
+
+    A) A key-recovery attack exploiting the differential structure of the central map
+    B) A large-scale quantum computer
+    C) A timing side-channel in the reference implementation
+    D) Grover's algorithm on the private key
+  answer: A
+  gold: "A"
+  explain: Beullens' attack recovered keys from the public key in about a weekend.
+
+- id: know-kyberslash
+  tier: knowledge
+  type: mcq
+  tags: [ml-kem, implementation, side-channel]
+  prompt: |
+    "KyberSlash" (2023-24) was which of the following?
+    Answer with the single letter only.
+
+    A) A break of the underlying Module-LWE problem
+    B) A timing side-channel in some reference implementations caused by secret-dependent division
+    C) A universal forgery against ML-DSA
+    D) A quantum key-recovery attack
+  answer: B
+  gold: "B"
+  explain: It was an implementation flaw (division on secret data), not a break of ML-KEM.
+
+- id: know-falcon-hard
+  tier: knowledge
+  type: mcq
+  tags: [fn-dsa, implementation]
+  prompt: |
+    Which PQC signature scheme requires floating-point FFT Gaussian sampling, making
+    constant-time implementation notably hard?
+    Answer with the single letter only.
+
+    A) ML-DSA
+    B) SLH-DSA
+    C) FN-DSA (FALCON)
+    D) LMS
+  answer: C
+  gold: "C"
+  explain: FN-DSA's sampling over the reals is the source of its implementation risk.
+
+- id: know-hybrid-why
+  tier: knowledge
+  type: mcq
+  tags: [deployment, hybrid]
+  prompt: |
+    Why do real deployments (e.g. TLS, Signal) run hybrid key exchange such as
+    X25519 + ML-KEM rather than ML-KEM alone?
+    Answer with the single letter only.
+
+    A) ML-KEM is slower than X25519 alone
+    B) To retain classical security if ML-KEM is broken, and gain quantum security if X25519 is broken
+    C) Because ML-KEM cannot be used on its own
+    D) To reduce total key size
+  answer: B
+  gold: "B"
+  explain: Hybrids are secure if either component holds — defence in depth during migration.
+
+- id: know-mlkem-512-level
+  tier: knowledge
+  type: mcq
+  tags: [ml-kem, parameters, security-level]
+  prompt: |
+    ML-KEM-512 targets which NIST security category?
+    Answer with the single letter only.
+
+    A) Category 1
+    B) Category 3
+    C) Category 5
+    D) Category 2
+  answer: A
+  gold: "A"
+  explain: ML-KEM-512 = category 1, -768 = category 3, -1024 = category 5.

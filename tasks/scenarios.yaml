@@ -1,0 +1,166 @@
+# PQC-Eval — real-world scenario tier (open response, weighted rubric)
+# Grounded in actual deployments and published guidance. See provenance/sources.yaml.
+
+- id: scen-india-bank-migration
+  tier: scenarios
+  type: rubric
+  tags: [india, banking, migration-plan]
+  prompt: |
+    You advise a large Indian bank that must plan its post-quantum migration.
+    Which requirements and timelines actually apply to it, and what should it do
+    first? Be specific about the Indian framework.
+  rubric:
+    - id: cites-tec
+      desc: references India's TEC / DST-NQM framework or TEC 910018:2025
+      weight: 1
+      match_any: ["tec", "dst", "national quantum mission", "910018"]
+    - id: cites-timeline
+      desc: gives the CII timelines (2027/2028/2029) or enterprise 2028/2030/2033
+      weight: 1
+      match_any: ["2027", "2028", "2029", "2033"]
+    - id: cites-cbom
+      desc: references CERT-In CBOM/QBOM requirement
+      weight: 1
+      match_any: ["cbom", "qbom", "bill of materials", "cert-in"]
+    - id: assume-breach
+      desc: mentions harvest-now-decrypt-later / assume-breach
+      weight: 1
+      match_any: ["harvest", "hndl", "assume-breach", "store now"]
+    - id: first-step
+      desc: recommends a cryptographic inventory/discovery as the first step
+      weight: 1
+      match_any: ["inventory", "discovery", "asset", "cryptographic inventory"]
+  must_not:
+    - ["there is no indian guidance", "india has no pqc policy"]
+  gold: |
+    India's framework applies through several bodies. The DST/National Quantum
+    Mission Task Force sets phased timelines: CII sectors such as banking should
+    hit foundations by 2027, high-priority migration by 2028, and full PQC
+    adoption by 2029 (other enterprises 2028/2030/2033). TEC's framework
+    (TEC 910018:2025) establishes a national testing and certification programme
+    with assurance levels L1-L4. CERT-In's v2.0 guidelines require a Cryptographic
+    BOM (CBOM) and Quantum BOM (QBOM) for cryptographic assets. Planning should
+    follow an "assume-breach" stance because of harvest-now-decrypt-later risk.
+    The first step is a cryptographic inventory/discovery across the estate,
+    prioritising long-lived sensitive data.
+
+- id: scen-ssh-fleet
+  tier: scenarios
+  type: rubric
+  tags: [openssh, operations]
+  prompt: |
+    Your server fleet runs OpenSSH 9.6. A security review asks whether your SSH
+    traffic is post-quantum safe. What is the actual situation and what should
+    you do?
+  rubric:
+    - id: explains-default
+      desc: explains sntrup761x25519 has been default since 9.0 (so likely PQ KEX already)
+      weight: 1
+      match_any: ["sntrup", "9.0", "already", "default since"]
+    - id: mlkem
+      desc: notes mlkem768x25519 added in 9.9 / default in 10.0
+      weight: 1
+      match_any: ["mlkem", "9.9", "10.0"]
+    - id: hybrid-reason
+      desc: explains hybrid keeps security if either algorithm breaks
+      weight: 1
+      match_any: ["hybrid", "either", "both", "x25519"]
+    - id: action
+      desc: recommends upgrading and/or verifying KexAlgorithms
+      weight: 1
+      match_any: ["upgrade", "kexalgorithms", "ssh -q kex", "config"]
+    - id: warning
+      desc: mentions 10.1 warns on non-PQ key exchange
+      weight: 1
+      match_any: ["10.1", "warn", "warning"]
+  must_not:
+    - ["ssh does not support post-quantum", "openssh has no pqc"]
+  gold: |
+    OpenSSH 9.6 already negotiates post-quantum key exchange by default: since
+    9.0 the default has been the hybrid sntrup761x25519-sha512, so your SSH
+    sessions are likely already PQ-protected for key agreement. The newer hybrid
+    mlkem768x25519-sha256 was added in 9.9 and became the default in 10.0. Hybrid
+    means the session is secure if either X25519 or the PQ algorithm holds.
+    Recommended action: upgrade toward 10.x and verify with `ssh -Q kex` and your
+    KexAlgorithms config. Note 10.1 warns when a non-PQ key exchange is selected.
+
+- id: scen-tls-gap
+  tier: scenarios
+  type: rubric
+  tags: [tls, deployment, signatures]
+  prompt: |
+    Your CDN reports that roughly half of client connections now negotiate
+    post-quantum key exchange, but post-quantum signatures are at essentially
+    zero. Explain why, and what the remaining gap means for you.
+  rubric:
+    - id: kex-vs-sig
+      desc: distinguishes key exchange (deployed) from signatures (not deployed)
+      weight: 1
+      match_any: ["key exchange", "key agreement", "signature"]
+    - id: x25519mlkem
+      desc: names X25519MLKEM768 as the negotiated group
+      weight: 1
+      match_any: ["x25519mlkem768", "mlkem768", "0x11ec"]
+    - id: why-sig-hard
+      desc: explains why PQ certificates/signatures lag (size, PKI, root stores)
+      weight: 1
+      match_any: ["certificate", "pki", "root store", "size", "bandwidth"]
+    - id: hndl-scope
+      desc: notes key exchange addresses harvest-now-decrypt-later, signatures address authentication
+      weight: 1
+      match_any: ["harvest", "hndl", "authentication", "store now"]
+    - id: action
+      desc: recommends planning for PQ certificates / crypto-agility
+      weight: 1
+      match_any: ["crypto-agility", "agility", "plan", "merkle", "certificate"]
+  must_not:
+    - ["post-quantum signatures are widely deployed", "pq certificates are standard today"]
+  gold: |
+    The two halves of TLS moved at different speeds. Key exchange is deployed:
+    browsers and CDNs negotiate the hybrid X25519MLKEM768 (codepoint 0x11ec),
+    which protects against harvest-now-decrypt-later. Signatures are not: PQ
+    certificates are rare because of size, PKI and root-store hurdles, so
+    authentication still relies on classical ECC/RSA. Key exchange protects
+    confidentiality of captured traffic; signatures protect authentication now.
+    The gap means your sessions are confidential against future decryption but
+    still authenticated classically. Plan for PQ certificates and crypto-agility.
+
+- id: scen-firmware-signing
+  tier: scenarios
+  type: rubric
+  tags: [cnsa-2.0, firmware, stateful-signatures]
+  prompt: |
+    You must design firmware signing to meet CNSA 2.0. Which signature algorithms
+    apply, and what operational constraint do they impose that a lattice signature
+    would not?
+  rubric:
+    - id: names-lms-xmss
+      desc: names LMS and/or XMSS from SP 800-208
+      weight: 1
+      match_any: ["lms", "xmss", "800-208"]
+    - id: stateful
+      desc: identifies that these are stateful (must track one-time key index)
+      weight: 1
+      match_any: ["stateful", "state", "one-time", "index"]
+    - id: hardware
+      desc: notes signing should be in hardware / state must not be reused
+      weight: 1
+      match_any: ["hardware", "hsm", "reuse", "state management"]
+    - id: contrast
+      desc: contrasts with ML-DSA/SLH-DSA which are stateless
+      weight: 1
+      match_any: ["stateless", "ml-dsa", "slh-dsa"]
+    - id: timeline
+      desc: notes the CNSA 2.0 signing deadline (exclusive by 2030)
+      weight: 1
+      match_any: ["2030", "2025"]
+  must_not:
+    - ["lms is stateless", "xmss does not need state"]
+  gold: |
+    CNSA 2.0 requires LMS or XMSS per NIST SP 800-208 for software and firmware
+    signing. These are stateful hash-based signatures: each one-time key index
+    must be used exactly once, so the signing system must reliably track and never
+    reuse state. That constraint is why signing is expected to run in hardware
+    (HSM) and is a poor fit for a large, distributed set of signers. By contrast
+    ML-DSA and SLH-DSA are stateless. CNSA 2.0 targets exclusive use of these
+    signing algorithms by 2030 (support and prefer by 2025).

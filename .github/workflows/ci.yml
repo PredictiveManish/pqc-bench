@@ -1,0 +1,25 @@
+name: gates
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Provenance gate (every task grounded in a real source)
+        run: python scripts/validate_sources.py
+      - name: Ground truth vs reference implementations
+        run: python scripts/validate_ground_truth.py
+      - name: Integrity gate (gold=1.0, null=0.0, bugs rejected)
+        run: python scripts/validate.py
+      - name: Plumbing tests
+        run: python tests/test_plumbing.py

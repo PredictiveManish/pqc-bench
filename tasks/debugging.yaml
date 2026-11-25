@@ -1,0 +1,169 @@
+# PQC-Eval — debugging tier (code with a latent defect)
+# `buggy` holds the raw defective submission (used to prove the task discriminates).
+# `gold` holds the corrected module.
+
+- id: dbg-barrett-rounding
+  tier: debugging
+  type: code
+  tags: [ml-kem, modular-reduction, bug]
+  checker: graders/checks/barrett.py
+  prompt: |
+    This Barrett reduction is subtly wrong: it disagrees with the ML-KEM
+    specification for some inputs. Find the defect, fix it, and return the full
+    corrected module (keep the name `barrett_reduce`). Return one Python code block.
+
+    ```python
+    Q = 3329
+    def barrett_reduce(a):
+        v = ((1 << 26) + Q // 2) // Q
+        t = (v * a) >> 26
+        t *= Q
+        return a - t
+    ```
+  buggy: |
+    Q = 3329
+    def barrett_reduce(a):
+        v = ((1 << 26) + Q // 2) // Q
+        t = (v * a) >> 26
+        t *= Q
+        return a - t
+  gold: |
+    ```python
+    Q = 3329
+    def barrett_reduce(a):
+        v = ((1 << 26) + Q // 2) // Q
+        t = (v * a + (1 << 25)) >> 26
+        t *= Q
+        return a - t
+    ```
+
+- id: dbg-compress-floor
+  tier: debugging
+  type: code
+  tags: [ml-kem, compression, bug]
+  checker: graders/checks/compress.py
+  prompt: |
+    The `compress_d` below rounds in the wrong direction, so it disagrees with
+    FIPS 203 for many inputs. Fix `compress_d` (leave `decompress_d` if it is
+    already correct) and return the full corrected module. One Python code block.
+
+    ```python
+    Q = 3329
+    def compress_d(x, d):
+        return ((x << d) // Q) & ((1 << d) - 1)
+    def decompress_d(y, d):
+        return (y * Q + (1 << (d - 1))) >> d
+    ```
+  buggy: |
+    Q = 3329
+    def compress_d(x, d):
+        return ((x << d) // Q) & ((1 << d) - 1)
+    def decompress_d(y, d):
+        return (y * Q + (1 << (d - 1))) >> d
+  gold: |
+    ```python
+    Q = 3329
+    def compress_d(x, d):
+        return (((x << d) + Q // 2) // Q) & ((1 << d) - 1)
+    def decompress_d(y, d):
+        return (y * Q + (1 << (d - 1))) >> d
+    ```
+
+- id: dbg-invntt-scaling
+  tier: debugging
+  type: code
+  tags: [ml-kem, ntt, bug]
+  checker: graders/checks/invntt.py
+  prompt: |
+    The inverse NTT below omits a final step, so NTT followed by inverse NTT is
+    not the identity modulo q. Fix `invntt` and return the full corrected module
+    (keep both `ntt` and `invntt`). One Python code block.
+
+    ```python
+    Q = 3329
+    def _br7(i):
+        return int(format(i, "07b")[::-1], 2)
+    ZETAS = [pow(17, _br7(i), Q) for i in range(128)]
+
+    def ntt(a):
+        a = list(a); k = 1; length = 128
+        while length >= 2:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k += 1
+                for j in range(start, start + length):
+                    t = (zeta * a[j + length]) % Q
+                    a[j + length] = (a[j] - t) % Q
+                    a[j] = (a[j] + t) % Q
+            length //= 2
+        return a
+
+    def invntt(a):
+        a = list(a); k = 127; length = 2
+        while length <= 128:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k -= 1
+                for j in range(start, start + length):
+                    t = a[j]
+                    a[j] = (t + a[j + length]) % Q
+                    a[j + length] = (zeta * (a[j + length] - t)) % Q
+            length *= 2
+        return a
+    ```
+  buggy: |
+    Q = 3329
+    def _br7(i):
+        return int(format(i, "07b")[::-1], 2)
+    ZETAS = [pow(17, _br7(i), Q) for i in range(128)]
+    def ntt(a):
+        a = list(a); k = 1; length = 128
+        while length >= 2:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k += 1
+                for j in range(start, start + length):
+                    t = (zeta * a[j + length]) % Q
+                    a[j + length] = (a[j] - t) % Q
+                    a[j] = (a[j] + t) % Q
+            length //= 2
+        return a
+    def invntt(a):
+        a = list(a); k = 127; length = 2
+        while length <= 128:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k -= 1
+                for j in range(start, start + length):
+                    t = a[j]
+                    a[j] = (t + a[j + length]) % Q
+                    a[j + length] = (zeta * (a[j + length] - t)) % Q
+            length *= 2
+        return a
+  gold: |
+    ```python
+    Q = 3329
+    def _br7(i):
+        return int(format(i, "07b")[::-1], 2)
+    ZETAS = [pow(17, _br7(i), Q) for i in range(128)]
+
+    def ntt(a):
+        a = list(a); k = 1; length = 128
+        while length >= 2:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k += 1
+                for j in range(start, start + length):
+                    t = (zeta * a[j + length]) % Q
+                    a[j + length] = (a[j] - t) % Q
+                    a[j] = (a[j] + t) % Q
+            length //= 2
+        return a
+
+    def invntt(a):
+        a = list(a); k = 127; length = 2
+        while length <= 128:
+            for start in range(0, 256, 2 * length):
+                zeta = ZETAS[k]; k -= 1
+                for j in range(start, start + length):
+                    t = a[j]
+                    a[j] = (t + a[j + length]) % Q
+                    a[j + length] = (zeta * (a[j + length] - t)) % Q
+            length *= 2
+        return [(x * 3303) % Q for x in a]
+    ```

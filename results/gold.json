@@ -1,0 +1,907 @@
+{
+  "model": "gold-oracle",
+  "k": 1,
+  "temperature": 0.0,
+  "duration_s": 0.67,
+  "usage": {
+    "calls": 41,
+    "cache_hits": 0,
+    "errors": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0
+  },
+  "est_cost_usd": null,
+  "summary": {
+    "n": 41,
+    "overall_mean_score": 1.0,
+    "overall_pass_rate": 1.0,
+    "by_tier": {
+      "debugging": {
+        "n": 3,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "implementation": {
+        "n": 4,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "judgment": {
+        "n": 3,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "knowledge": {
+        "n": 10,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "scenarios": {
+        "n": 4,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "standards": {
+        "n": 17,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      }
+    },
+    "by_type": {
+      "code": {
+        "n": 7,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "mcq": {
+        "n": 27,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      },
+      "rubric": {
+        "n": 7,
+        "mean_score": 1.0,
+        "pass_rate": 1.0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "dbg-barrett-rounding",
+      "tier": "debugging",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\ndef barrett_reduce(a):\n    v = ((1 << 26) + Q // 2) // Q\n    t = (v * a + (1 << 25)) >> 26\n    t *= Q\n    return a - t\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "dbg-compress-floor",
+      "tier": "debugging",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\ndef compress_d(x, d):\n    return (((x << d) + Q // 2) // Q) & ((1 << d) - 1)\ndef decompress_d(y, d):\n    return (y * Q + (1 << (d - 1))) >> d\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "dbg-invntt-scaling",
+      "tier": "debugging",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\ndef _br7(i):\n    return int(format(i, \"07b\")[::-1], 2)\nZETAS = [pow(17, _br7(i), Q) for i in range(128)]\n\ndef ntt(a):\n    a = list(a); k = 1; length = 128\n    while length >= 2:\n        for start in range(0, 256, 2 * length):\n            zeta = ZETAS[k]; k += 1\n            for j in range(start, start + length):\n                t = (zeta * a[j + length]) % Q\n                a[j + length] = (a[j] - t) % Q\n                a[j] = (a[j] + t) % Q\n        length //= 2\n    return a\n\ndef invntt(a):\n    a = list(a); k = 127; length = 2\n    while length <= 128:\n        for start in range(0, 256, 2 * length):\n            zeta = ZETAS[k]; k -= 1\n            for j in range(start, start + length):\n                t = a[j]\n                a[j] = (t + a[j + length]) % Q\n                a[j + length] = (zeta * (a[j + length] - t)) % Q\n        length *= 2\n    return [(x * 3303) % Q for x in a]\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "impl-compress",
+      "tier": "implementation",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\n\ndef compress_d(x, d):\n    return (((x << d) + Q // 2) // Q) & ((1 << d) - 1)\n\ndef decompress_d(y, d):\n    return (y * Q + (1 << (d - 1))) >> d\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "impl-bitrev7",
+      "tier": "implementation",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\ndef bitrev7(i):\n    r = 0\n    for b in range(7):\n        r |= ((i >> b) & 1) << (6 - b)\n    return r\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "impl-zetas",
+      "tier": "implementation",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\n\ndef bitrev7(i):\n    r = 0\n    for b in range(7):\n        r |= ((i >> b) & 1) << (6 - b)\n    return r\n\ndef zetas():\n    return [pow(17, bitrev7(i), Q) for i in range(128)]\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "impl-barrett",
+      "tier": "implementation",
+      "type": "code",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "code",
+          "score": 1.0,
+          "ok": true,
+          "msg": "ok",
+          "status": "call",
+          "output": "```python\nQ = 3329\n\ndef barrett_reduce(a):\n    v = ((1 << 26) + Q // 2) // Q\n    t = (v * a + (1 << 25)) >> 26\n    t *= Q\n    return a - t\n```\n"
+        }
+      ]
+    },
+    {
+      "id": "judge-iot-signature",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "recommends-ml-dsa",
+              "hit": true
+            },
+            {
+              "id": "quantifies-size",
+              "hit": true
+            },
+            {
+              "id": "notes-hash-only",
+              "hit": true
+            },
+            {
+              "id": "considers-constraint",
+              "hit": true
+            },
+            {
+              "id": "acknowledges-assumption-gap",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "Recommend ML-DSA-44 (Dilithium). Its signatures are about 2.4 KB, while\nSLH-DSA-128s signatures are roughly 7.9 KB; on a 200-byte LoRa frame the extra\nbandwidth and energy cost of SLH-DSA is significant for a battery-powered\nsensor. ML-DSA rests on module-lattice assumptions, which are less conservative\nthan SLH-DSA's reliance only on hash security, but the lattice assumptions\nbehind ML-KEM and ML-DSA are the best-studied post-quantum assumptions and are\ndeployed at scale. If bandwidth were abundant I would pick SLH-DSA for its\nminimal assumptions; here bandwidth and energy dominate. Both need constant-time\nimplementation care.\n"
+        }
+      ]
+    },
+    {
+      "id": "judge-tls-kem",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "recommends-mlkem-or-hybrid",
+              "hit": true
+            },
+            {
+              "id": "notes-mceliece-size",
+              "hit": true
+            },
+            {
+              "id": "notes-handshake-impact",
+              "hit": true
+            },
+            {
+              "id": "hybrid-rationale",
+              "hit": true
+            },
+            {
+              "id": "notes-mceliece-conservative",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "Recommend a hybrid of X25519 and ML-KEM-768 for TLS 1.3. ML-KEM-768 has a\n~1.2 KB encapsulation key and ~1.1 KB ciphertext, which fits comfortably in a\nTLS handshake. Classic McEliece has a public key around 1 MB, which bloats the\nhandshake and any certificate carrying it and is impractical at e-commerce\nscale. McEliece is more conservative \u2014 code-based, with decades of study \u2014 but\nits key size rules it out for mass TLS. Running the hybrid keeps classical\nsecurity if ML-KEM is later broken while adding quantum security; the added\nbytes are modest.\n"
+        }
+      ]
+    },
+    {
+      "id": "judge-falcon-risk",
+      "tier": "judgment",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "floating-point",
+              "hit": true
+            },
+            {
+              "id": "side-channel",
+              "hit": true
+            },
+            {
+              "id": "determinism",
+              "hit": true
+            },
+            {
+              "id": "alternative",
+              "hit": true
+            },
+            {
+              "id": "mitigation",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "FN-DSA (FALCON) does give the smallest signatures, but the cost is\nimplementation risk. It relies on floating-point FFT Gaussian sampling, and\nmaking that constant-time is notoriously hard; floating-point non-determinism\nacross platforms also threatens reproducibility. These factors raise the risk of\nside-channel leakage and correctness bugs. ML-DSA is simpler to implement\nsafely, at the cost of larger signatures. I would only agree to FN-DSA with a\nwell-vetted reference implementation and an independent side-channel audit.\n"
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-basis",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-768-eksize",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-fips-number",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-slhdsa-basis",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "know-sike-break",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-rainbow-break",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "A",
+          "expected": "A",
+          "status": "call",
+          "output": "A"
+        }
+      ]
+    },
+    {
+      "id": "know-kyberslash",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-falcon-hard",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "know-hybrid-why",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "know-mlkem-512-level",
+      "tier": "knowledge",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "A",
+          "expected": "A",
+          "status": "call",
+          "output": "A"
+        }
+      ]
+    },
+    {
+      "id": "scen-india-bank-migration",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "cites-tec",
+              "hit": true
+            },
+            {
+              "id": "cites-timeline",
+              "hit": true
+            },
+            {
+              "id": "cites-cbom",
+              "hit": true
+            },
+            {
+              "id": "assume-breach",
+              "hit": true
+            },
+            {
+              "id": "first-step",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "India's framework applies through several bodies. The DST/National Quantum\nMission Task Force sets phased timelines: CII sectors such as banking should\nhit foundations by 2027, high-priority migration by 2028, and full PQC\nadoption by 2029 (other enterprises 2028/2030/2033). TEC's framework\n(TEC 910018:2025) establishes a national testing and certification programme\nwith assurance levels L1-L4. CERT-In's v2.0 guidelines require a Cryptographic\nBOM (CBOM) and Quantum BOM (QBOM) for cryptographic assets. Planning should\nfollow an \"assume-breach\" stance because of harvest-now-decrypt-later risk.\nThe first step is a cryptographic inventory/discovery across the estate,\nprioritising long-lived sensitive data.\n"
+        }
+      ]
+    },
+    {
+      "id": "scen-ssh-fleet",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "explains-default",
+              "hit": true
+            },
+            {
+              "id": "mlkem",
+              "hit": true
+            },
+            {
+              "id": "hybrid-reason",
+              "hit": true
+            },
+            {
+              "id": "action",
+              "hit": true
+            },
+            {
+              "id": "warning",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "OpenSSH 9.6 already negotiates post-quantum key exchange by default: since\n9.0 the default has been the hybrid sntrup761x25519-sha512, so your SSH\nsessions are likely already PQ-protected for key agreement. The newer hybrid\nmlkem768x25519-sha256 was added in 9.9 and became the default in 10.0. Hybrid\nmeans the session is secure if either X25519 or the PQ algorithm holds.\nRecommended action: upgrade toward 10.x and verify with `ssh -Q kex` and your\nKexAlgorithms config. Note 10.1 warns when a non-PQ key exchange is selected.\n"
+        }
+      ]
+    },
+    {
+      "id": "scen-tls-gap",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "kex-vs-sig",
+              "hit": true
+            },
+            {
+              "id": "x25519mlkem",
+              "hit": true
+            },
+            {
+              "id": "why-sig-hard",
+              "hit": true
+            },
+            {
+              "id": "hndl-scope",
+              "hit": true
+            },
+            {
+              "id": "action",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "The two halves of TLS moved at different speeds. Key exchange is deployed:\nbrowsers and CDNs negotiate the hybrid X25519MLKEM768 (codepoint 0x11ec),\nwhich protects against harvest-now-decrypt-later. Signatures are not: PQ\ncertificates are rare because of size, PKI and root-store hurdles, so\nauthentication still relies on classical ECC/RSA. Key exchange protects\nconfidentiality of captured traffic; signatures protect authentication now.\nThe gap means your sessions are confidential against future decryption but\nstill authenticated classically. Plan for PQ certificates and crypto-agility.\n"
+        }
+      ]
+    },
+    {
+      "id": "scen-firmware-signing",
+      "tier": "scenarios",
+      "type": "rubric",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "rubric",
+          "score": 1.0,
+          "raw_coverage": 1.0,
+          "matched": [
+            {
+              "id": "names-lms-xmss",
+              "hit": true
+            },
+            {
+              "id": "stateful",
+              "hit": true
+            },
+            {
+              "id": "hardware",
+              "hit": true
+            },
+            {
+              "id": "contrast",
+              "hit": true
+            },
+            {
+              "id": "timeline",
+              "hit": true
+            }
+          ],
+          "violation": null,
+          "status": "call",
+          "output": "CNSA 2.0 requires LMS or XMSS per NIST SP 800-208 for software and firmware\nsigning. These are stateful hash-based signatures: each one-time key index\nmust be used exactly once, so the signing system must reliably track and never\nreuse state. That constraint is why signing is expected to run in hardware\n(HSM) and is a poor fit for a large, distributed set of signers. By contrast\nML-DSA and SLH-DSA are stateless. CNSA 2.0 targets exclusive use of these\nsigning algorithms by 2030 (support and prefer by 2025).\n"
+        }
+      ]
+    },
+    {
+      "id": "std-nist-disallow",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-nist-hva",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-kem",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-firmware",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-cnsa-browser",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-tls-codepoint",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-openssh-default",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-uk-ncsc-2028",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-anssi-hybrid",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-bsi-keyagreement",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "A",
+          "expected": "A",
+          "status": "call",
+          "output": "A"
+        }
+      ]
+    },
+    {
+      "id": "std-india-certin-cbom",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-india-tec-framework",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-india-cii-timeline",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-hqc-role",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-pq3-level",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "C",
+          "expected": "C",
+          "status": "call",
+          "output": "C"
+        }
+      ]
+    },
+    {
+      "id": "std-signal-kem",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "B",
+          "expected": "B",
+          "status": "call",
+          "output": "B"
+        }
+      ]
+    },
+    {
+      "id": "std-pq-sig-adoption",
+      "tier": "standards",
+      "type": "mcq",
+      "score": 1.0,
+      "samples": [
+        {
+          "type": "mcq",
+          "score": 1.0,
+          "correct": true,
+          "predicted": "A",
+          "expected": "A",
+          "status": "call",
+          "output": "A"
+        }
+      ]
+    }
+  ]
+}
