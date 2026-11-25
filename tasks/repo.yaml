@@ -1,5 +1,8 @@
-# PQC-Eval — repository-level engineering tier
-# These execute model output inside a fixture workspace (harness/repo_runner.py).
+# PQC-Eval — repository-level engineering tier (harness/repo_runner.py)
+# Not all of these execute code:
+#   discovery -> structured findings are scored (no execution)
+#   patch/kat -> submitted code is executed against fixture tests / KAT vectors
+#   artifact  -> submitted JSON is validated by a fixture script
 
 - id: repo-discover-crypto
   tier: engineering

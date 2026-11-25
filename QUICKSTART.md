@@ -1,4 +1,4 @@
-# Quickstart — set up, verify, and run PQCBench
+# Quickstart — set up, verify, and run PQC-Eval
 
 Three audiences, three paths. Pick yours.
 
@@ -71,9 +71,10 @@ and token/cost usage. Re-running the same command hits the disk cache and costs
 nothing — use `--no-cache` to force fresh calls.
 
 Notes:
-- `--k N` = best-of-N. At temperature 0 the model is sampled **once** and the
-  result replicated, so `--k` changes cost but not score — keep `--k 1`. Best-of-k
-  is only meaningful with `--temperature` above 0.
+- `--k N` = best-of-N. At temperature 0 (the default) the runner makes **one**
+  request per task and replicates it across `k`, so `--k` changes neither the score
+  nor the cost — keep `--k 1`. With `--temperature` above 0, `k` independent
+  samples are requested and cost scales with `k`.
 - `--workers` controls concurrency; lower it if you hit rate limits.
 - `--price-in/--price-out` (USD per 1M tokens) add a cost estimate.
 - Keys are read from the environment only and never written to disk.
@@ -120,10 +121,10 @@ The gates will reject an unsourced task. That is deliberate.
 
 ## Publishing checklist (maintainers)
 
-- [ ] CI runs the four gates on every push (`.github/workflows/ci.yml`).
-- [ ] `LICENSE` chosen (MIT by default — change if you prefer Apache-2.0).
+- [x] CI runs the four gates on every push (`.github/workflows/ci.yml`).
+- [x] `LICENSE` present (MIT).
 - [ ] Repo public; README renders; `STANDARDS.md` links resolve.
-- [ ] Tag a release (`v1.0.0`) and mint a Zenodo DOI.
-- [ ] HuggingFace: dataset for `tasks/`, Space for the leaderboard.
-- [ ] Add baseline results from at least 2–3 named models before calling it a
-      leaderboard.
+- [ ] Tag the release (`v1.0.0`).
+- [ ] (Optional) Mint a Zenodo DOI for citation.
+- [ ] Publish baseline results from at least 2–3 named models before presenting
+      any leaderboard.

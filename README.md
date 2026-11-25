@@ -33,7 +33,7 @@ pip install -r requirements.txt      # pyyaml, kyber-py, dilithium-py
 ```bash
 export OPENAI_API_KEY=sk-...
 python scripts/run_eval.py --provider openai --model gpt-4o \
-    --k 3 --workers 8 --md results/gpt-4o.md --out results/gpt-4o.json
+    --k 1 --workers 8 --md results/gpt-4o.md --out results/gpt-4o.json
 ```
 
 Providers: `sarvam`, `openai`, `anthropic`, `gemini`, or `compatible` (vLLM,
@@ -72,8 +72,14 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 These are **repo-context** tasks: the fixture files named in `context_files` are
 injected into the model's prompt. The model does **not** receive filesystem or
 terminal access, so this measures repository *reasoning*, not agentic
-engineering. Returned code is executed in process-level isolation (temp cwd,
-scrubbed env, rlimits, `unshare -n` when permitted) — not a container.
+engineering.
+
+What happens to the output differs by task: discovery tasks have their
+structured findings **scored**; patch and KAT tasks have submitted code
+**executed** against fixture tests or KAT vectors; the CBOM task has submitted
+JSON **validated** by a schema check. Where code does run, it runs in
+process-level isolation (temp cwd, scrubbed env, rlimits, `unshare -n` when
+permitted) — not a container.
 
 **Not yet statistically validated.** 57 tasks support a research preview, not a
 model ranking. There are no published baselines, no held-out split and no

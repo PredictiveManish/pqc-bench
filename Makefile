@@ -15,7 +15,7 @@ test:
 all: sources validate groundtruth test
 
 run-example:
-	python3 scripts/run_eval.py --provider openai --model gpt-4o --k 3 --md results/gpt-4o.md
+	python3 scripts/run_eval.py --provider openai --model gpt-4o --k 1 --md results/gpt-4o.md
 
 clean:
 	rm -rf results/*.json results/*.md .cache

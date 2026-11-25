@@ -5,7 +5,7 @@ Examples
 OpenAI:
     export OPENAI_API_KEY=sk-...
     python scripts/run_eval.py --provider openai --model gpt-4o \
-        --k 5 --workers 8 --md results/gpt-4o.md
+        --k 1 --workers 8 --md results/gpt-4o.md
 
 Anthropic:
     export ANTHROPIC_API_KEY=sk-ant-...
