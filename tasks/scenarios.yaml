@@ -34,6 +34,7 @@
     - id: cii-designation
       desc: distinguishes designated CII from the banking sector generally
       weight: 1
+      critical: true
       match_any: ["designated", "critical information infrastructure", "if designated", "applicability", "sectoral regulator"]
   must_not:
     - ["there is no indian guidance", "india has no pqc policy"]

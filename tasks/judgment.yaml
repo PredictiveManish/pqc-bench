@@ -15,6 +15,7 @@
       desc: recommends ML-DSA-44 (or a clearly reasoned equivalent)
       weight: 1
       match_any: ["ml-dsa-44", "dilithium"]
+      not_match_any: ["reject ml-dsa", "not recommend ml-dsa", "would not recommend ml-dsa", "against ml-dsa", "use slh-dsa", "prefer slh-dsa"]
     - id: quantifies-size
       desc: quantifies the signature-size gap (ML-DSA ~2.4KB vs SLH-DSA ~7.9KB)
       weight: 1

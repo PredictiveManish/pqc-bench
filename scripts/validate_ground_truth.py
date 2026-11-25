@@ -2,8 +2,12 @@
 
 This is not a mock. It checks that the reference formulas our graders use agree
 with kyber-py / dilithium-py (independent, widely used implementations of the
-FIPS 203 / 204 standards), and that those implementations pass KAT-style
-round-trips at the sizes the standards specify.
+FIPS 203 / 204 standards), and that those implementations pass round-trip
+consistency checks at the sizes the standards specify.
+
+These are NOT official NIST known-answer tests (KATs). Round-trip consistency
+shows two operations agree; it does not establish FIPS conformance. ACVP/KAT
+vectors are the missing piece (see ROADMAP.md).
 
 Run:  python scripts/validate_ground_truth.py
 Exit code is non-zero if any cross-check fails.
@@ -61,7 +65,7 @@ def validate_kyber():
     check("compress_d matches reference", ok_c, bad or "")
     check("decompress_d matches reference", ok_d, bad or "")
 
-    # 3. scheme sizes + KAT-style round trip
+    # 3. scheme sizes + round-trip consistency (not official KATs)
     from kyber_py.ml_kem import ML_KEM_512, ML_KEM_768, ML_KEM_1024
     for name, mod, ek_len, ct_len in [
         ("ML-KEM-512", ML_KEM_512, 800, 768),

@@ -78,9 +78,12 @@ trace any fact to the document that states it, and re-verify dates cheaply.
   harness is verified end to end with stubs; a key is the only missing piece.
 - **Standards drift.** Facts verified 2026-11-25; deadlines change. The registry
   makes re-verification cheap but does not automate it.
-- **Barrett / compress / zetas checkers** encode the same reference formula as
-  the task, so they are not fully independent; only the NTT is cross-checked
-  against `kyber-py`. Official ACVP vectors are the fix.
+- **Two different things, deliberately.** Each standalone grader (Barrett,
+  compress, zetas) computes the reference formula itself, so it is not
+  independent of the task. Separately, `validate_ground_truth.py` cross-checks
+  the zeta table and compress/decompress against `kyber-py`, and the NTT grader
+  compares against it directly. So: the *graders* are formula-based; the
+  *cross-validation script* is independent. Official ACVP vectors remain the fix.
 - **MCQ parsing** takes the last explicit answer marker; with several letters and
   no marker it returns `ambiguous` rather than guessing.
 - **Rubric keyword scoring** rewards mention, not correctness.

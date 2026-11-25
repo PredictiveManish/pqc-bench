@@ -147,6 +147,12 @@ def test_adversarial_rubric():
     ns = score(t, negated)["score"]
     check("correct answer scores ~1.0", cs >= 0.99, cs)
     check("negated wrong answer scores low", ns <= 0.4, ns)
+    ti = {x["id"]: x for x in load_tasks()}["judge-iot-signature"]
+    reject = ("I would reject ML-DSA-44 and use SLH-DSA-128s. ML-DSA has 2.4 KB "
+              "signatures, SLH-DSA has 7.9 KB, and bandwidth is important.")
+    rec = [m for m in score(ti, reject)["matched"]
+           if m["id"] == "recommends-ml-dsa"][0]
+    check("rejecting ML-DSA does not earn the recommendation", rec["hit"] is False)
 
 
 def test_docs_match_tasks():

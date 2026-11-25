@@ -13,6 +13,8 @@ import re
 
 from graders.code_runner import extract_code, run_check
 
+SCORER_VERSION = "2026.11.1"
+
 
 def score(task: dict, output: str) -> dict:
     t = task.get("type")
@@ -157,6 +159,11 @@ def _rubric(task: dict, output: str) -> dict:
         w = float(c.get("weight", 1))
         wsum += w
         hit = any(_kw_hit(text, k.lower()) for k in c.get("match_any", []))
+        # Criterion-level exclusion: an answer that explicitly rejects the thing
+        # must not be credited for merely naming it ("I would reject ML-DSA-44").
+        if hit and c.get("not_match_any"):
+            if any(_kw_hit(text, k.lower()) for k in c["not_match_any"]):
+                hit = False
         matched.append({"id": c.get("id"), "hit": hit,
                         "critical": bool(c.get("critical"))})
         if hit:

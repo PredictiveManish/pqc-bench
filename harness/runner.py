@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -11,7 +12,7 @@ from pathlib import Path
 import yaml
 
 from harness.metrics import aggregate
-from harness.scorers import score
+from harness.scorers import SCORER_VERSION, score
 from harness.types import Completion
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,12 +35,31 @@ def load_tasks(tasks_dir: str | None = None, tiers: list[str] | None = None) -> 
 
 
 def benchmark_version(tasks: list[dict]) -> str:
-    """Stable hash of task content + scoring config, so a score can be tied to
-    the exact benchmark version that produced it."""
+    """Stable hash covering everything that can change a score.
+
+    Includes the full canonical task (prompt, type, tier, choices, answer, gold,
+    rubric, must_not, ...), the *contents* of each checker file, the scorer
+    implementation, and the scorer version. Editing a prompt or a checker now
+    changes the version, so a report can never claim to be the same benchmark.
+    """
     h = hashlib.sha256()
+    h.update(f"scorer:{SCORER_VERSION}".encode())
+    h.update(b"\x00")
     for t in sorted(tasks, key=lambda x: x["id"]):
-        h.update(repr((t["id"], t.get("answer"), t.get("gold"),
-                       t.get("rubric"), t.get("checker"))).encode())
+        canon = {k: v for k, v in t.items() if not k.startswith("_")}
+        h.update(json.dumps(canon, sort_keys=True, default=str).encode())
+        h.update(b"\x00")
+        ck = t.get("checker")
+        if ck:
+            p = ROOT / ck
+            h.update(hashlib.sha256(p.read_bytes()).hexdigest().encode()
+                     if p.exists() else b"missing")
+            h.update(b"\x00")
+    try:
+        import harness.scorers as _S
+        h.update(hashlib.sha256(inspect.getsource(_S).encode()).hexdigest().encode())
+    except Exception:
+        pass
     return h.hexdigest()[:16]
 
 
