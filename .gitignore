@@ -4,3 +4,5 @@ __pycache__/
 results/
 *.pyc
 LAUNCH.md
+ROADMAP.md
+DESIGN.md
