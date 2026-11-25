@@ -105,10 +105,13 @@ The gates will reject an unsourced task. That is deliberate.
 | Symptom | Cause | Fix |
 |---|---|---|
 | `OPENAI_API_KEY is not set` | no credentials | export the key, or use `--provider compatible` against a local server |
-| `error: unknown provider` | typo | one of `openai, anthropic, gemini, compatible` |
+| `error: unknown provider` | typo | one of `sarvam, openai, anthropic, gemini, compatible` |
 | Slow run | concurrency too low | raise `--workers` |
 | `HTTP 429` | rate limited | lower `--workers`; retries already back off |
 | Scores all zero | key invalid or model refusing | check the `failures` list in the report |
+| `EMPTY response` in failures | model spent `--max-tokens` on reasoning, emitted nothing | raise `--max-tokens` (e.g. 16384); `sarvam-105b` is verbose |
+| Code task scores 0 with `kyber-py unavailable` | NTT grading fails closed without the independent reference | `pip install -r requirements.txt` (includes kyber-py); do not grade without it |
+| Re-run finishes in ~0.01s | served from `.cache` | expected — 0 calls, 0 credits; use `--no-cache` to force fresh |
 | Gate fails after editing tasks | missing provenance / wrong gold | read the failing gate's message; it names the task id |
 
 ---
@@ -118,7 +121,7 @@ The gates will reject an unsourced task. That is deliberate.
 - [ ] CI runs the four gates on every push (`.github/workflows/ci.yml`).
 - [ ] `LICENSE` chosen (MIT by default — change if you prefer Apache-2.0).
 - [ ] Repo public; README renders; `STANDARDS.md` links resolve.
-- [ ] Tag a release (`v0.3`) and mint a Zenodo DOI.
+- [ ] Tag a release (`v0.10`) and mint a Zenodo DOI.
 - [ ] HuggingFace: dataset for `tasks/`, Space for the leaderboard.
 - [ ] Add baseline results from at least 2–3 named models before calling it a
       leaderboard.

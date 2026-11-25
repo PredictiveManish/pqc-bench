@@ -10,7 +10,7 @@ Apple, Signal). Nothing in the suite is an unsourced LLM assertion: the
 provenance registry binds each task to its sources, and the build fails if any
 task is ungrounded.
 
-**v0.3 — standards-grounded.**
+**v0.10 — standards-grounded.**
 
 ## What's grounded, and how
 
@@ -51,7 +51,7 @@ python scripts/run_eval.py --provider sarvam --model sarvam-105b \
 Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 `standards,scenarios`), `--no-cache`, `--price-in/--price-out`.
 
-## What it measures (41 tasks)
+## What it measures (43 tasks)
 
 | Tier | What | Type | Ground truth |
 |---|---|---|---|
@@ -67,7 +67,7 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 Four gates run before any model result counts (`make all`):
 
 1. **`scripts/validate_sources.py`** — every task has ≥1 real source URL
-   (41/41 tasks, 58 sources, verified 2026-11-25).
+   (43/43 tasks, 59 sources, verified 2026-11-25).
 2. **`scripts/validate_ground_truth.py`** — our zeta/compress formulas match
    `kyber-py` exactly, and ML-KEM-512/768/1024 and ML-DSA-44/65/87 round-trip at
    the standard's sizes. Checked against the real implementations.
@@ -114,10 +114,15 @@ fails.
   answer can mis-score. Fix: answer-span extraction.
 - **Rubric scoring is keyword coverage**, a proxy — a fluent wrong answer can hit
   keywords. LLM-judge upgrade is in `DESIGN.md`.
-- **41 tasks** is a solid skeleton, not a statistically robust eval.
+- **43 tasks** is a solid skeleton, not a statistically robust eval.
 
 ## Scope and ethics
 
 Tasks target published standards and documented attacks for evaluation and
 education. Debugging tasks contain deliberately broken code to measure detection;
 they are not tools for attacking deployed systems.
+
+PQC-Eval is an independent evaluation project. It is **not a certification
+scheme**, and it is not endorsed by, affiliated with, or approved by NIST,
+CERT-In, TEC, the DST, NSA, BSI, ANSSI, ENISA, the NCSC or any government. A
+score is not a compliance or certification claim about any model or product.

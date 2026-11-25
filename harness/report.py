@@ -5,6 +5,32 @@ from __future__ import annotations
 import datetime
 
 
+EM = "\u2014"
+
+
+def _fail_detail(d: dict) -> str:
+    if d.get("error"):
+        return f"error: {d['error']}"
+    if d.get("empty"):
+        return (f"EMPTY response (finish_reason={d.get('finish_reason') or '?'})"
+                + " " + EM + " raise --max-tokens")
+    if d.get("type") == "mcq":
+        return (f"predicted {d.get('predicted') or EM} "
+                f"(via {d.get('method') or 'none'}); expected {d.get('expected')}")
+    if d.get("type") == "rubric":
+        if d.get("violation"):
+            return f"VIOLATION: {d['violation']}"
+        missed = [m.get("id") for m in d.get("matched", []) if not m.get("hit")]
+        return f"coverage {d.get('raw_coverage', 0.0):.0%}; missed: {', '.join(missed) or '\u2014'}"
+    return str(d.get("msg") or d.get("violation") or "")
+
+
+def _snippet(d: dict, n: int = 160) -> str:
+    s = (d.get("output") or "").replace("|", "\\|")
+    s = " ".join(s.split())
+    return s[:n] + ("\u2026" if len(s) > n else "")
+
+
 def _tier_table(summary: dict) -> str:
     rows = ["| Tier | n | Mean score | Pass rate |", "|---|---|---|---|"]
     for tier, b in summary["by_tier"].items():
@@ -47,13 +73,13 @@ def render_markdown(report: dict) -> str:
     if not fails:
         lines.append("None — every task passed.")
     else:
-        lines += ["| Task | Tier | Score | Reason |", "|---|---|---|---|"]
+        lines += ["| Task | Tier | Score | Detail | Model output (truncated) |",
+                  "|---|---|---|---|---|"]
         for r in fails:
             d = r["samples"][0]
-            reason = (d.get("error") or d.get("msg") or d.get("predicted")
-                      or d.get("violation") or "")
-            reason = str(reason).replace("|", "\\|")[:120]
-            lines.append(f"| {r['id']} | {r['tier']} | {r['score']:.2f} | {reason} |")
+            detail = _fail_detail(d).replace("|", "\\|")
+            lines.append(f"| {r['id']} | {r['tier']} | {r['score']:.2f} | "
+                         f"{detail} | {_snippet(d)} |")
 
     lines += [
         "",

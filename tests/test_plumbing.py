@@ -115,11 +115,54 @@ def test_concurrency_and_cache():
         check("markdown has overall line", "Overall mean score" in text)
 
 
+def test_mcq_parsing():
+    print("\n[scorer] MCQ tolerates text answers")
+    from harness.scorers import score
+    t = {"type": "mcq", "answer": "C",
+         "prompt": "q\n    A) ML-KEM-512\n    B) ML-KEM-768\n    C) ML-KEM-1024\n    D) X25519 alone\n"}
+    check("bare letter", score(t, "C")["correct"] is True)
+    check("choice text", score(t, "ML-KEM-1024")["correct"] is True)
+    check("marker phrase", score(t, "The answer is C")["correct"] is True)
+    check("wrong letter", score(t, "B) ML-KEM-768")["correct"] is False)
+    check("no answer -> None", score(t, "I have no idea")["predicted"] is None)
+
+
+def test_adversarial_rubric():
+    print("\n[scorer] negation / contradiction cannot earn credit")
+    from harness.scorers import score
+    from harness.runner import load_tasks
+    t = {x["id"]: x for x in load_tasks()}["scen-firmware-signing"]
+    correct = ("CNSA 2.0 requires LMS or XMSS (SP 800-208) for firmware signing. "
+               "They are stateful: each one-time key index must be used exactly "
+               "once, so signing runs in an HSM. ML-DSA is stateless by contrast. "
+               "Exclusive use by 2030.")
+    negated = ("LMS and XMSS are not stateful; no one-time key index tracking is "
+               "needed. ML-DSA is stateless. CNSA 2.0 firmware signing uses LMS "
+               "and XMSS by 2030.")
+    cs = score(t, correct)["score"]
+    ns = score(t, negated)["score"]
+    check("correct answer scores ~1.0", cs >= 0.99, cs)
+    check("negated wrong answer scores low", ns <= 0.4, ns)
+
+
+def test_docs_match_tasks():
+    print("\n[docs] README counts match the task set")
+    from harness.runner import load_tasks
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    readme = open(os.path.join(root, "README.md"), encoding="utf-8").read()
+    n = len(load_tasks())
+    check(f"README states '{n} tasks'", f"{n} tasks" in readme)
+    check("no stale '41 tasks'", "41 tasks" not in readme)
+
+
 def main() -> int:
     print("=" * 56)
     print("PQC-Eval plumbing tests (no credentials required)")
     print("=" * 56)
     test_provider_parsing()
+    test_mcq_parsing()
+    test_adversarial_rubric()
+    test_docs_match_tasks()
     test_concurrency_and_cache()
     print("\n" + "=" * 56)
     if FAILS:

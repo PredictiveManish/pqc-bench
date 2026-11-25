@@ -68,8 +68,9 @@ validator (`scripts/validate_sources.py`) fails if any task lacks provenance.
   India": national testing & certification framework with assurance levels
   **L1–L4** (validity 3–10 years), Tier-1/Tier-2 labs by **Dec 2026**, and a
   phased migration — **CII sectors: Foundations 2027, High Priority 2028, Full
-  adoption 2029**; other enterprises **2028 / 2030 / 2033**. "Assume-breach"
-  principle for HNDL.
+  adoption 2029**; other enterprises **2028 / 2030 / 2033**. The report states this
+  framework is **not itself a regulatory mandate** — sectoral regulators set
+  timelines and enforcement. "Assume-breach" principle for HNDL.
   https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
   https://www.thehindu.com/news/national/critical-sectors-must-have-quantum-safe-encryption-urges-task-force/article71029610.ece
   https://tec.gov.in/pdf/TR/Quantum-Safe-Ecosystem-in-India_260514_174510_.pdf

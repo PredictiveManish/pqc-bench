@@ -21,7 +21,8 @@
     - id: cites-cbom
       desc: references CERT-In CBOM/QBOM requirement
       weight: 1
-      match_any: ["cbom", "qbom", "bill of materials", "cert-in"]
+      critical: true
+      match_any: ["cbom", "qbom", "bill of materials", "cryptographic bill"]
     - id: assume-breach
       desc: mentions harvest-now-decrypt-later / assume-breach
       weight: 1
@@ -30,19 +31,29 @@
       desc: recommends a cryptographic inventory/discovery as the first step
       weight: 1
       match_any: ["inventory", "discovery", "asset", "cryptographic inventory"]
+    - id: cii-designation
+      desc: distinguishes designated CII from the banking sector generally
+      weight: 1
+      match_any: ["designated", "critical information infrastructure", "if designated", "applicability", "sectoral regulator"]
   must_not:
     - ["there is no indian guidance", "india has no pqc policy"]
   gold: |
     India's framework applies through several bodies. The DST/National Quantum
     Mission Task Force sets phased timelines: CII sectors such as banking should
     hit foundations by 2027, high-priority migration by 2028, and full PQC
-    adoption by 2029 (other enterprises 2028/2030/2033). TEC's framework
-    (TEC 910018:2025) establishes a national testing and certification programme
-    with assurance levels L1-L4. CERT-In's v2.0 guidelines require a Cryptographic
+    adoption by 2029 (other enterprises 2028/2030/2033). These are proposed
+    roadmap milestones, not a regulatory mandate: the report states its framework
+    is not itself binding and enables sectoral regulators to set their own
+    timelines. The L1-L4 testing and certification framework is described in that
+    DST report, through its TEC-led sub-group; TEC 910018:2025 is the separate
+    technical migration report. CERT-In's v2.0 guidelines require a Cryptographic
     BOM (CBOM) and Quantum BOM (QBOM) for cryptographic assets. Planning should
     follow an "assume-breach" stance because of harvest-now-decrypt-later risk.
     The first step is a cryptographic inventory/discovery across the estate,
-    prioritising long-lived sensitive data.
+    prioritising long-lived sensitive data. Whether the CII milestones apply
+    depends on whether the entity is formally designated critical information
+    infrastructure rather than merely being a bank; sectoral regulators determine
+    applicability.
 
 - id: scen-ssh-fleet
   tier: scenarios
@@ -100,6 +111,7 @@
     - id: x25519mlkem
       desc: names X25519MLKEM768 as the negotiated group
       weight: 1
+      critical: true
       match_any: ["x25519mlkem768", "mlkem768", "0x11ec"]
     - id: why-sig-hard
       desc: explains why PQ certificates/signatures lag (size, PKI, root stores)
@@ -137,11 +149,13 @@
     - id: names-lms-xmss
       desc: names LMS and/or XMSS from SP 800-208
       weight: 1
+      critical: true
       match_any: ["lms", "xmss", "800-208"]
     - id: stateful
       desc: identifies that these are stateful (must track one-time key index)
       weight: 1
-      match_any: ["stateful", "state", "one-time", "index"]
+      critical: true
+      match_any: ["stateful", "one-time key", "state management", "key index", "must not reuse"]
     - id: hardware
       desc: notes signing should be in hardware / state must not be reused
       weight: 1
@@ -156,6 +170,7 @@
       match_any: ["2030", "2025"]
   must_not:
     - ["lms is stateless", "xmss does not need state"]
+    - ["not stateful", "no one-time key", "does not require state"]
   gold: |
     CNSA 2.0 requires LMS or XMSS per NIST SP 800-208 for software and firmware
     signing. These are stateful hash-based signatures: each one-time key index

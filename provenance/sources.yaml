@@ -168,13 +168,20 @@ tasks:
       - https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR02102/BSI-TR-02102.pdf?__blob=publicationFile
       - https://www.bsi.bund.de/DE/Service-Navi/Presse/Pressemitteilungen/Presse2026/260211_Ende_klassischer_Verschluesselungsverfahren.html
   std-india-certin-cbom:
-    basis: "CERT-In v2.0 guidelines require CBOM/QBOM"
+    basis: "CERT-In v2.0 scopes CBOM/QBOM to government, public-sector and essential-services orgs and suppliers"
     sources:
       - https://cert-in.org.in/PDF/TechnicalGuidelines-on-SBOM,QBOM&CBOM,AIBOM_and_HBOM_ver2.0.pdf
   std-india-tec-framework:
-    basis: "TEC/DST framework: national PQC testing & certification, L1-L4"
+    basis: "TEC 910018:2025 is a technical migration report (not the L1-L4 framework)"
     sources:
       - https://tec.gov.in/pdf/TR/Final%20technical%20report%20on%20migration%20to%20PQC%2028-03-25.pdf
+  std-india-l1l4-source:
+    basis: "DST Task Force report (Feb 2026) describes the L1-L4 framework via its TEC-led sub-group"
+    sources:
+      - https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
+  std-india-mandate:
+    basis: "DST report: proposed framework is not a regulatory mandate; regulators set timelines"
+    sources:
       - https://www.dst.gov.in/static/uploads/2026/07/dba5f97fa8f4c8db5ef668306548a470.pdf
   std-india-cii-timeline:
     basis: "DST/NQM: CII full PQC adoption by 2029"

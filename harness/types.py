@@ -11,6 +11,7 @@ class Completion:
     model: str = ""
     prompt_tokens: int = 0
     completion_tokens: int = 0
+    finish_reason: str = ""
     raw: dict | None = field(default=None, repr=False)
 
     def as_dict(self) -> dict:
@@ -19,6 +20,7 @@ class Completion:
             "model": self.model,
             "prompt_tokens": self.prompt_tokens,
             "completion_tokens": self.completion_tokens,
+            "finish_reason": self.finish_reason,
         }
 
     @classmethod
@@ -28,4 +30,5 @@ class Completion:
             model=d.get("model", ""),
             prompt_tokens=d.get("prompt_tokens", 0),
             completion_tokens=d.get("completion_tokens", 0),
+            finish_reason=d.get("finish_reason", ""),
         )

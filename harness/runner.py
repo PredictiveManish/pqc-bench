@@ -97,6 +97,9 @@ def run(model, tasks: list[dict], *, k: int = 1, out_path: str | None = None,
             s = score(t, comp.text)
             s["status"] = status
             s["output"] = comp.text
+            if not (comp.text or "").strip():
+                s["empty"] = True
+                s["finish_reason"] = comp.finish_reason
             samples.append(s)
         best = max((s["score"] for s in samples), default=0.0)
         results.append({"id": t["id"], "tier": t["tier"], "type": t["type"],
@@ -156,7 +159,7 @@ def print_report(report: dict) -> None:
     fails = [r for r in report["results"] if r["score"] < 0.999]
     if fails:
         print("  failures:")
+        from harness.report import _fail_detail
         for r in fails:
             d = r["samples"][0]
-            reason = d.get("error") or d.get("msg") or d.get("predicted") or d.get("violation")
-            print(f"    - {r['id']:<24} score={r['score']:.2f} {reason or ''}")
+            print(f"    - {r['id']:<24} score={r['score']:.2f}  {_fail_detail(d)}")

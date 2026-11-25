@@ -80,7 +80,7 @@ trace any fact to the document that states it, and re-verify dates cheaply.
   makes re-verification cheap but does not automate it.
 - **MCQ parsing** picks the first standalone A–E letter.
 - **Rubric keyword scoring** rewards mention, not correctness.
-- **41 tasks** is a skeleton, not a statistically robust eval.
+- **43 tasks** is a skeleton, not a statistically robust eval.
 
 ## 9. Roadmap
 

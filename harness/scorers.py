@@ -25,10 +25,63 @@ def score(task: dict, output: str) -> dict:
     return {"type": t, "score": 0.0, "error": f"unknown task type: {t}"}
 
 
+_CHOICE_RE = re.compile(r"^\s*\(?([A-E])\)\s*(.+?)\s*$", re.M)
+
+
+def _choices_from_prompt(prompt: str) -> dict[str, str]:
+    """Recover the A)..E) options that are written inline in the prompt."""
+    out: dict[str, str] = {}
+    for m in _CHOICE_RE.finditer(prompt or ""):
+        out[m.group(1)] = m.group(2)
+    return out
+
+
+_UNI = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-",
+                      "\u2013": "-", "\u2014": "-", "\u2212": "-",
+                      "\u00a0": " ", "\u202f": " ", "\u2009": " "})
+
+
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", s.translate(_UNI).lower()).strip()
+
+
 def _mcq(task: dict, output: str) -> dict:
+    """Score an MCQ, tolerating answers given as text rather than a bare letter.
+
+    Order of inference: explicit marker ("answer is B"), leading letter ("B)"),
+    choice-text match ("ML-KEM-1024"), then any standalone letter.
+    """
     expected = str(task["answer"]).strip().upper()
-    letters = re.findall(r"\b([A-E])\b", (output or "").upper())
-    predicted = letters[0] if letters else None
+    text = output or ""
+    up = text.upper()
+    choices = _choices_from_prompt(task.get("prompt", ""))
+    predicted = None
+    method = None
+
+    m = re.search(r"\b(?:ANSWER|CHOICE|OPTION)\b[^A-E]{0,12}\b([A-E])\b", up)
+    if m:
+        predicted, method = m.group(1), "marker"
+
+    if predicted is None:
+        m = re.match(r"\s*\(?([A-E])\)?[\.\):\-]", text)
+        if m:
+            predicted, method = m.group(1).upper(), "leading"
+
+    if predicted is None and choices:
+        body = _norm(text)
+        best = None
+        for letter, ctext in choices.items():
+            c = _norm(ctext)
+            if len(c) >= 2 and c in body and (best is None or len(c) > best[1]):
+                best = (letter, len(c))
+        if best:
+            predicted, method = best[0], "choice-text"
+
+    if predicted is None:
+        letters = re.findall(r"\b([A-E])\b", up)
+        if letters:
+            predicted, method = letters[0], "any-letter"
+
     ok = predicted == expected
     return {
         "type": "mcq",
@@ -36,6 +89,7 @@ def _mcq(task: dict, output: str) -> dict:
         "correct": ok,
         "predicted": predicted,
         "expected": expected,
+        "method": method,
     }
 
 
@@ -50,32 +104,76 @@ def _code(task: dict, output: str) -> dict:
     return out
 
 
+_NEG_TOKENS = ("not ", "no ", "never ", "without ", "n't ", "cannot ",
+               "fails to ", "does not ", "is not ", "are not ", "neither ")
+
+
+def _negated(text: str, idx: int) -> bool:
+    """True if a negation occurs in the same clause immediately before `idx`.
+
+    The window is cut at the last clause boundary so that "Signatures are not:
+    PQ certificates are rare" does not count as negating "certificate".
+    """
+    window = text[max(0, idx - 45):idx]
+    for sep in (". ", "; ", ": ", "\n"):
+        j = window.rfind(sep)
+        if j >= 0:
+            window = window[j + len(sep):]
+    return any(tok in window for tok in _NEG_TOKENS)
+
+
+def _kw_hit(text: str, kw: str) -> bool:
+    """True if `kw` occurs at least once WITHOUT being negated.
+
+    "LMS is not stateful" must not satisfy a `stateful` criterion.
+    """
+    start = 0
+    while True:
+        i = text.find(kw, start)
+        if i < 0:
+            return False
+        if not _negated(text, i):
+            return True
+        start = i + len(kw)
+
+
 def _rubric(task: dict, output: str) -> dict:
-    text = (output or "").lower()
+    # Normalise unicode dashes/NBSP: models emit "ML\u2011DSA" which would
+    # otherwise fail to match "ml-dsa".
+    text = (output or "").translate(_UNI).lower()
     criteria = task.get("rubric", [])
     matched = []
     wsum = 0.0
     wgot = 0.0
+    critical_missed = []
     for c in criteria:
         w = float(c.get("weight", 1))
         wsum += w
-        hit = any(k.lower() in text for k in c.get("match_any", []))
-        matched.append({"id": c.get("id"), "hit": hit})
+        hit = any(_kw_hit(text, k.lower()) for k in c.get("match_any", []))
+        matched.append({"id": c.get("id"), "hit": hit,
+                        "critical": bool(c.get("critical"))})
         if hit:
             wgot += w
+        elif c.get("critical"):
+            critical_missed.append(c.get("id"))
 
     violation = None
     for group in task.get("must_not", []):
-        if any(k.lower() in text for k in group):
+        if any(_kw_hit(text, k.lower()) for k in group):
             violation = group[0]
             break
 
     raw = (wgot / wsum) if wsum else 0.0
     final = 0.0 if violation else raw
+    # Missing an essential criterion caps the score: breadth cannot compensate
+    # for omitting the one thing the question is actually about.
+    if critical_missed and not violation:
+        final = min(final, 0.4)
     return {
         "type": "rubric",
         "score": final,
         "raw_coverage": raw,
         "matched": matched,
         "violation": violation,
+        "critical_missed": critical_missed,
     }

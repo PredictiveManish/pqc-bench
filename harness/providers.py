@@ -92,7 +92,9 @@ class OpenAIProvider(BaseProvider):
         text = d["choices"][0]["message"]["content"]
         return Completion(text=text, model=d.get("model", self.model),
                           prompt_tokens=u.get("prompt_tokens", 0),
-                          completion_tokens=u.get("completion_tokens", 0), raw=d)
+                          completion_tokens=u.get("completion_tokens", 0),
+                          finish_reason=str(d["choices"][0].get("finish_reason") or ""),
+                          raw=d)
 
 
 class OpenAICompatibleProvider(OpenAIProvider):
@@ -206,13 +208,15 @@ class SarvamProvider(BaseProvider):
                     f"Detail: {e}") from e
             raise
         choice = (d.get("choices") or [{}])[0]
-        text = (choice.get("message") or {}).get("content") or ""
+        msg = choice.get("message") or {}
+        text = msg.get("content") or ""
         u = d.get("usage") or {}
         return Completion(
             text=text,
             model=d.get("model", self.model),
             prompt_tokens=u.get("prompt_tokens", u.get("input_tokens", 0)),
             completion_tokens=u.get("completion_tokens", u.get("output_tokens", 0)),
+            finish_reason=str(choice.get("finish_reason") or ""),
             raw=d,
         )
 
