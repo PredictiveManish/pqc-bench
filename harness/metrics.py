@@ -23,9 +23,13 @@ def aggregate(results: list[dict]) -> dict:
 
     all_scores = [float(r["score"]) for r in results]
     overall = (sum(all_scores) / len(all_scores)) if all_scores else 0.0
+    # Best-of-k (r["score"]) is optimistic; report the first sample separately.
+    first_scores = [float(r["samples"][0]["score"]) for r in results if r.get("samples")]
+    first_mean = (sum(first_scores) / len(first_scores)) if first_scores else 0.0
     return {
         "n": len(results),
         "overall_mean_score": overall,
+        "overall_mean_first_sample": first_mean,
         "overall_pass_rate": (sum(1 for x in all_scores if x >= 0.999)
                               / len(all_scores)) if all_scores else 0.0,
         "by_tier": {k: _block(v) for k, v in sorted(by_tier.items())},

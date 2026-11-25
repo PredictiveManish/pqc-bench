@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -32,6 +33,16 @@ def load_tasks(tasks_dir: str | None = None, tiers: list[str] | None = None) -> 
     return tasks
 
 
+def benchmark_version(tasks: list[dict]) -> str:
+    """Stable hash of task content + scoring config, so a score can be tied to
+    the exact benchmark version that produced it."""
+    h = hashlib.sha256()
+    for t in sorted(tasks, key=lambda x: x["id"]):
+        h.update(repr((t["id"], t.get("answer"), t.get("gold"),
+                       t.get("rubric"), t.get("checker"))).encode())
+    return h.hexdigest()[:16]
+
+
 def _complete(model, prompt: str, **kw) -> Completion:
     if hasattr(model, "complete"):
         return model.complete(prompt, **kw)
@@ -44,6 +55,9 @@ def run(model, tasks: list[dict], *, k: int = 1, out_path: str | None = None,
         temperature: float = 0.0, max_tokens: int = 4096, system: str = "",
         pricing: tuple[float, float] | None = None, verbose: bool = True) -> dict:
     pname = getattr(model, "name", "unknown")
+    # Cache identity must include the endpoint: the same model name on two
+    # different base URLs is a different model.
+    pid = getattr(model, "cache_id", pname)
     # Deterministic decoding: sample once per task and replicate; sampling k
     # times at temperature 0 only wastes tokens and races the cache.
     jobs = ([(t, 0) for t in tasks] if temperature == 0
@@ -56,7 +70,7 @@ def run(model, tasks: list[dict], *, k: int = 1, out_path: str | None = None,
         key = None
         if cache is not None:
             salt = str(idx) if temperature > 0 else ""
-            key = cache.key(pname, task["prompt"], system, temperature, max_tokens, salt)
+            key = cache.key(pid, task["prompt"], system, temperature, max_tokens, salt)
             hit = cache.get(key)
             if hit is not None:
                 return task["id"], idx, hit, "hit", None
@@ -111,8 +125,10 @@ def run(model, tasks: list[dict], *, k: int = 1, out_path: str | None = None,
         cost = (usage["prompt_tokens"] / 1e6 * pin
                 + usage["completion_tokens"] / 1e6 * pout)
 
+    bver = benchmark_version(tasks)
     report = {
         "model": pname,
+        "benchmark_version": bver,
         "k": k,
         "temperature": temperature,
         "duration_s": round(time.time() - t0, 2),

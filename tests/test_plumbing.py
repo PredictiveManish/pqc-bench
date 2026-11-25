@@ -125,6 +125,10 @@ def test_mcq_parsing():
     check("marker phrase", score(t, "The answer is C")["correct"] is True)
     check("wrong letter", score(t, "B) ML-KEM-768")["correct"] is False)
     check("no answer -> None", score(t, "I have no idea")["predicted"] is None)
+    check("last answer wins over earlier option mention",
+          score(t, "I considered option A initially, but the correct answer is C.")["correct"] is True)
+    check("ambiguous refused, not guessed",
+          score(t, "A or B or C")["predicted"] is None)
 
 
 def test_adversarial_rubric():

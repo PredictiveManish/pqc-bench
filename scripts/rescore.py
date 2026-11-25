@@ -50,8 +50,18 @@ def main() -> int:
         results.append({"id": r["id"], "tier": r["tier"], "type": r["type"],
                         "score": best, "samples": samples})
 
+    from harness.runner import benchmark_version
+    bver = benchmark_version(list(tasks.values()))
+    old_bver = old.get("benchmark_version")
+    if old_bver and old_bver != bver:
+        print(f"  WARNING: benchmark version changed ({old_bver} -> {bver}); "
+              f"these scores are not comparable to the original run")
+
     new = {
         "model": old.get("model", "unknown"),
+        "benchmark_version": bver,
+        "rescored": True,
+        "rescored_from_version": old_bver,
         "k": old.get("k", 1),
         "temperature": old.get("temperature", 0.0),
         "duration_s": 0.0,

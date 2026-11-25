@@ -58,9 +58,12 @@ def _mcq(task: dict, output: str) -> dict:
     predicted = None
     method = None
 
-    m = re.search(r"\b(?:ANSWER|CHOICE|OPTION)\b[^A-E]{0,12}\b([A-E])\b", up)
-    if m:
-        predicted, method = m.group(1), "marker"
+    # Explicit answer statements: take the LAST one, so "I considered option A ...
+    # but the correct answer is C" resolves to C, not A.
+    ans = re.findall(
+        r"\b(?:CORRECT\s+ANSWER|FINAL\s+ANSWER|ANSWER)\s*(?:IS|:)?\s*\(?\s*([A-E])\b", up)
+    if ans:
+        predicted, method = ans[-1], "answer-marker"
 
     if predicted is None:
         m = re.match(r"\s*\(?([A-E])\)?[\.\):\-]", text)
@@ -78,9 +81,12 @@ def _mcq(task: dict, output: str) -> dict:
             predicted, method = best[0], "choice-text"
 
     if predicted is None:
-        letters = re.findall(r"\b([A-E])\b", up)
-        if letters:
-            predicted, method = letters[0], "any-letter"
+        letters = set(re.findall(r"\b([A-E])\b", up))
+        if len(letters) == 1:
+            predicted, method = letters.pop(), "single-letter"
+        elif len(letters) > 1:
+            # Several candidate letters and no explicit answer: refuse to guess.
+            method = "ambiguous"
 
     ok = predicted == expected
     return {
@@ -90,6 +96,7 @@ def _mcq(task: dict, output: str) -> dict:
         "predicted": predicted,
         "expected": expected,
         "method": method,
+        "ambiguous": method == "ambiguous",
     }
 
 

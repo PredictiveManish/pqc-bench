@@ -77,6 +77,7 @@ class OpenAIProvider(BaseProvider):
         if not self.api_key:
             raise ProviderError("OPENAI_API_KEY is not set")
         self.name = f"openai:{model}"
+        self.cache_id = f"{self.name}|{self.base_url}"
 
     def complete(self, prompt, *, system="", temperature=0.0, max_tokens=4096):
         msgs = []
@@ -107,6 +108,7 @@ class OpenAICompatibleProvider(OpenAIProvider):
         super().__init__(model, api_key=api_key or os.environ.get("COMPATIBLE_API_KEY", "not-needed"),
                          base_url=base_url)
         self.name = f"compatible:{model}"
+        self.cache_id = f"{self.name}|{self.base_url}"
 
 
 class AnthropicProvider(BaseProvider):
@@ -188,6 +190,7 @@ class SarvamProvider(BaseProvider):
         self.base_url = (base_url or os.environ.get(
             "SARVAM_BASE_URL", "https://api.sarvam.ai/v1")).rstrip("/")
         self.name = f"sarvam:{model}"
+        self.cache_id = f"{self.name}|{self.base_url}"
 
     def complete(self, prompt, *, system="", temperature=0.0, max_tokens=4096):
         msgs = []

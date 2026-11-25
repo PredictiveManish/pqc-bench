@@ -78,9 +78,13 @@ trace any fact to the document that states it, and re-verify dates cheaply.
   harness is verified end to end with stubs; a key is the only missing piece.
 - **Standards drift.** Facts verified 2026-11-25; deadlines change. The registry
   makes re-verification cheap but does not automate it.
-- **MCQ parsing** picks the first standalone A–E letter.
+- **Barrett / compress / zetas checkers** encode the same reference formula as
+  the task, so they are not fully independent; only the NTT is cross-checked
+  against `kyber-py`. Official ACVP vectors are the fix.
+- **MCQ parsing** takes the last explicit answer marker; with several letters and
+  no marker it returns `ambiguous` rather than guessing.
 - **Rubric keyword scoring** rewards mention, not correctness.
-- **43 tasks** is a skeleton, not a statistically robust eval.
+- **44 tasks** is a skeleton, not a statistically robust eval.
 
 ## 9. Roadmap
 

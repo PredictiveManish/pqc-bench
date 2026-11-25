@@ -20,6 +20,11 @@ def check(mod):
     samples = list(range(-4000, 4000, 37)) + [rng.randrange(-Q * Q, Q * Q) for _ in range(256)]
     for a in samples:
         got = fn(a)
+        # Independent properties: congruent to a mod q, and actually reduced.
+        if (a - got) % Q != 0:
+            return False, f"barrett_reduce({a})={got} is not congruent mod q"
+        if abs(got) >= Q:
+            return False, f"barrett_reduce({a})={got} is not reduced (|r| >= q)"
         exp = _ref(a)
         if got != exp:
             return False, f"barrett_reduce({a})={got} expected {exp}"

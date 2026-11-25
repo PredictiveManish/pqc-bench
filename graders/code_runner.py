@@ -91,10 +91,14 @@ def run_check(code: str, checker_path: str, timeout: int = 20) -> dict:
         with open(script, "w", encoding="utf-8") as fh:
             fh.write(_INNER % {"modp": modp, "chk": str(chk)})
         try:
+            # Scrub secrets from the environment: submitted code must not be
+            # able to read API keys or tokens via os.environ.
+            safe_env = {k: v for k, v in os.environ.items()
+                        if not re.search(r"KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL", k, re.I)}
             proc = subprocess.run(
                 [sys.executable, script],
                 capture_output=True, text=True, timeout=timeout + 5,
-                preexec_fn=_limits(timeout),
+                preexec_fn=_limits(timeout), env=safe_env,
             )
         except subprocess.TimeoutExpired:
             return {"ok": False, "error": "timeout"}

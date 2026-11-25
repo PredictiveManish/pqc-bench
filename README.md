@@ -51,7 +51,7 @@ python scripts/run_eval.py --provider sarvam --model sarvam-105b \
 Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 `standards,scenarios`), `--no-cache`, `--price-in/--price-out`.
 
-## What it measures (43 tasks)
+## What it measures (44 tasks)
 
 | Tier | What | Type | Ground truth |
 |---|---|---|---|
@@ -67,7 +67,7 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 Four gates run before any model result counts (`make all`):
 
 1. **`scripts/validate_sources.py`** — every task has ≥1 real source URL
-   (43/43 tasks, 59 sources, verified 2026-11-25).
+   (44/44 tasks, 60 sources, verified 2026-11-25).
 2. **`scripts/validate_ground_truth.py`** — our zeta/compress formulas match
    `kyber-py` exactly, and ML-KEM-512/768/1024 and ML-DSA-44/65/87 round-trip at
    the standard's sizes. Checked against the real implementations.
@@ -89,7 +89,7 @@ make test          # plumbing
 STANDARDS.md      verified standards & deployment reference
 provenance/       task id -> sources registry
 harness/          providers, runner, cache, scorers, metrics, report
-graders/          sandboxed code execution + per-task checkers
+graders/          resource-limited subprocess execution + per-task checkers
 tasks/            knowledge / standards / implementation / debugging /
                   judgment / scenarios (.yaml)
 scripts/          run_eval, validate, validate_ground_truth, validate_sources
@@ -110,11 +110,15 @@ fails.
   are fully verified; a key is the only missing piece. Run the command above.
 - **Standards move.** Facts are verified as of 2026-11-25; re-verify before relying
   on any date. The registry makes that cheap.
-- **MCQ parsing** takes the first standalone A–E letter; narration before the
-  answer can mis-score. Fix: answer-span extraction.
-- **Rubric scoring is keyword coverage**, a proxy — a fluent wrong answer can hit
-  keywords. LLM-judge upgrade is in `DESIGN.md`.
-- **43 tasks** is a solid skeleton, not a statistically robust eval.
+- **MCQ parsing** uses the last explicit answer marker and returns `ambiguous`
+  rather than guessing when several letters appear.
+- **Rubric scoring is keyword coverage** with a clause-scoped negation guard — a
+  proxy. A fluent wrong answer can still slip through; an LLM judge calibrated
+  against humans is the fix (`DESIGN.md`).
+- **Code execution** is a resource-limited subprocess, not a security sandbox:
+  environment secrets are scrubbed and rlimits applied, but it is not safe for
+  hostile third-party submissions.
+- **44 tasks** is a solid skeleton, not a statistically robust eval.
 
 ## Scope and ethics
 

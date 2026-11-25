@@ -144,6 +144,10 @@ tasks:
     sources:
       - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
       - https://pqcstatus.com/articles/cnsa-2-0-timeline/
+  std-cnsa-signatures:
+    basis: "CNSA 2.0: ML-DSA-87 for general signatures; LMS/XMSS for firmware signing"
+    sources:
+      - https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF
   std-tls-codepoint:
     basis: "X25519MLKEM768 = TLS codepoint 0x11ec"
     sources:

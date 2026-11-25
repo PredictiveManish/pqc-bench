@@ -63,7 +63,7 @@ announce before the repo is public and CI is green.
 >
 > US high-value assets: 2030. India CII: 2029. UK: 2035.
 >
-> So I built PQCBench — 43 tasks, each traced to a primary source. No source, no
+> So I built PQCBench — 44 tasks, each traced to a primary source. No source, no
 > task.
 >
 > Repo + how to run it 👇
@@ -84,7 +84,7 @@ TLS domains negotiated post-quantum key exchange — all X25519MLKEM768, codepoi
 Key exchange and signatures are two different migrations, and almost nobody
 says so.
 
-3/ So I built PQCBench. 43 tasks, six tiers: the algorithms, the standards, real
+3/ So I built PQCBench. 44 tasks, six tiers: the algorithms, the standards, real
 FIPS 203 debugging, and scenario questions like "your bank is in India, what
 applies?" and "your SSH fleet runs 9.6, are you exposed?"
 
@@ -119,7 +119,7 @@ Try to break a task. Link below.
 >
 > That gap is what I wanted to measure, so I built PQCBench.
 >
-> 43 tasks across six tiers: the algorithms, the standards, debugging real
+> 44 tasks across six tiers: the algorithms, the standards, debugging real
 > FIPS 203 code, and scenario questions — a bank in India, an SSH fleet on 9.6,
 > the fact that post-quantum key exchange is everywhere while post-quantum
 > signatures are nowhere.

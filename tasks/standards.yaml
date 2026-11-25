@@ -85,6 +85,23 @@
   gold: "C"
   explain: Browsers/servers/cloud/OS exclusive CNSA 2.0 by 2033; networking equipment and signing by 2030.
 
+- id: std-cnsa-signatures
+  tier: standards
+  type: mcq
+  tags: [cnsa-2.0, signatures, ml-dsa]
+  prompt: |
+    Which algorithm does CNSA 2.0 require for general-purpose digital
+    signatures (as distinct from software/firmware signing)?
+    Answer with the single letter only.
+
+    A) ML-DSA-87
+    B) LMS
+    C) RSA-3072 with PSS
+    D) ECDSA P-384
+  answer: A
+  gold: "A"
+  explain: CNSA 2.0 uses ML-DSA-87 for general signatures; LMS/XMSS are specified for software and firmware signing.
+
 - id: std-tls-codepoint
   tier: standards
   type: mcq
