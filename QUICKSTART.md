@@ -33,7 +33,7 @@ export OPENAI_API_KEY=sk-...          # or ANTHROPIC_API_KEY / GEMINI_API_KEY / 
 
 # full suite
 python scripts/run_eval.py --provider openai --model gpt-4o \
-    --k 3 --workers 8 --md results/gpt-4o.md --out results/gpt-4o.json
+    --k 1 --workers 8 --md results/gpt-4o.md --out results/gpt-4o.json
 
 # just the standards + scenarios tiers (the real-world part)
 python scripts/run_eval.py --provider openai --model gpt-4o \
@@ -71,7 +71,9 @@ and token/cost usage. Re-running the same command hits the disk cache and costs
 nothing — use `--no-cache` to force fresh calls.
 
 Notes:
-- `--k N` = pass@k (best of N). At temperature 0 it samples once and replicates.
+- `--k N` = best-of-N. At temperature 0 the model is sampled **once** and the
+  result replicated, so `--k` changes cost but not score — keep `--k 1`. Best-of-k
+  is only meaningful with `--temperature` above 0.
 - `--workers` controls concurrency; lower it if you hit rate limits.
 - `--price-in/--price-out` (USD per 1M tokens) add a cost estimate.
 - Keys are read from the environment only and never written to disk.
@@ -121,7 +123,7 @@ The gates will reject an unsourced task. That is deliberate.
 - [ ] CI runs the four gates on every push (`.github/workflows/ci.yml`).
 - [ ] `LICENSE` chosen (MIT by default — change if you prefer Apache-2.0).
 - [ ] Repo public; README renders; `STANDARDS.md` links resolve.
-- [ ] Tag a release (`v0.10`) and mint a Zenodo DOI.
+- [ ] Tag a release (`v1.0.0`) and mint a Zenodo DOI.
 - [ ] HuggingFace: dataset for `tasks/`, Space for the leaderboard.
 - [ ] Add baseline results from at least 2–3 named models before calling it a
       leaderboard.

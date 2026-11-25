@@ -10,7 +10,7 @@ Apple, Signal). Nothing in the suite is an unsourced LLM assertion: the
 provenance registry binds each task to its sources, and the build fails if any
 task is ungrounded.
 
-**v0.10 — standards-grounded.**
+**v1.0.0 — standards-grounded.**
 
 ## What's grounded, and how
 
@@ -63,11 +63,21 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 | scenarios | India bank migration, SSH fleet, TLS PQ-signature gap, CNSA 2.0 firmware signing | open | weighted rubric + sources |
 | engineering | repo discovery, indirect-usage audit, CBOM, patch, ML-KEM encapsulation | repo | P/R/F1 + evidence, or fixture tests / KAT |
 
-**Repository tier:** five tasks run model output inside a fixture workspace —
-a crypto-audit discovery task, a patch task graded by the fixture's own
-`unittest` suite, and an ML-KEM-512 encapsulation task graded against fixed KAT
-vectors. Execution is process-isolated (temp cwd, scrubbed env, rlimits,
-`unshare -n` when permitted), not containerised.
+**Repository tier (5 tasks):** `repo-discover-crypto` (token-recall audit),
+`repo-discover-indirect` (precision / recall / F1 + evidence accuracy),
+`repo-patch-crypto` (graded by the fixture's own `unittest` suite),
+`repo-cbom` (CycloneDX-style schema validator) and
+`fullscheme-mlkem-encaps` (fixed KAT vectors).
+
+These are **repo-context** tasks: the fixture files named in `context_files` are
+injected into the model's prompt. The model does **not** receive filesystem or
+terminal access, so this measures repository *reasoning*, not agentic
+engineering. Returned code is executed in process-level isolation (temp cwd,
+scrubbed env, rlimits, `unshare -n` when permitted) — not a container.
+
+**Not yet statistically validated.** 57 tasks support a research preview, not a
+model ranking. There are no published baselines, no held-out split and no
+human-calibrated scorer yet; treat scores as indicative.
 
 ## Why the numbers are trustworthy
 

@@ -8,6 +8,7 @@
   repo:
     fixture: fixtures/audit-app
     mode: discovery
+    context_files: [app.py]
     expected: ["KEY_BITS", "HARDCODED_KEY", "md5"]
   prompt: |
     You are auditing the repository in `fixtures/audit-app`. Identify the
