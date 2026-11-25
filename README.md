@@ -61,8 +61,9 @@ Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 | debugging | find the latent defect in real PQC code | code | defect injected, graded by execution |
 | judgment | IoT signature choice, TLS KEM trade-off, FALCON risk | open | weighted rubric |
 | scenarios | India bank migration, SSH fleet, TLS PQ-signature gap, CNSA 2.0 firmware signing | open | weighted rubric + sources |
+| engineering | repo discovery, indirect-usage audit, CBOM, patch, ML-KEM encapsulation | repo | P/R/F1 + evidence, or fixture tests / KAT |
 
-**Repository tier:** three tasks run model output inside a fixture workspace —
+**Repository tier:** five tasks run model output inside a fixture workspace —
 a crypto-audit discovery task, a patch task graded by the fixture's own
 `unittest` suite, and an ML-KEM-512 encapsulation task graded against fixed KAT
 vectors. Execution is process-isolated (temp cwd, scrubbed env, rlimits,

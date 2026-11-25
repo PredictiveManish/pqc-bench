@@ -32,7 +32,9 @@ Alternatives if `PQCBench` is taken on GitHub/PyPI/HuggingFace:
 - **DeployedBench** — emphasises real deployments over textbook crypto.
 
 Check availability on GitHub, PyPI and HuggingFace before committing. Keep the
-subtitle that does the real work: *"the conformance-first PQC benchmark."*
+subtitle that does the real work: *"a source-grounded post-quantum cryptography
+capability and engineering benchmark."* (Not "conformance" — this is not a FIPS
+conformance suite.)
 
 ---
 
@@ -61,7 +63,8 @@ announce before the repo is public and CI is green.
 > Ask a model when to migrate to post-quantum crypto and you get a confident
 > answer. It's probably wrong for your country.
 >
-> US high-value assets: 2030. India CII: 2029. UK: 2035.
+> US high-value assets: 2030. India CII: 2029 (proposed milestones, not a
+> universal mandate). UK: 2035.
 >
 > So I built PQCBench — 57 tasks, each traced to a primary source. No source, no
 > task.
@@ -84,7 +87,7 @@ TLS domains negotiated post-quantum key exchange — all X25519MLKEM768, codepoi
 Key exchange and signatures are two different migrations, and almost nobody
 says so.
 
-3/ So I built PQCBench. 57 tasks, six tiers: the algorithms, the standards, real
+3/ So I built PQCBench. 57 tasks, seven tiers: the algorithms, the standards, real
 FIPS 203 debugging, and scenario questions like "your bank is in India, what
 applies?" and "your SSH fleet runs 9.6, are you exposed?"
 
@@ -119,7 +122,7 @@ Try to break a task. Link below.
 >
 > That gap is what I wanted to measure, so I built PQCBench.
 >
-> 57 tasks across six tiers: the algorithms, the standards, debugging real
+> 57 tasks across seven tiers: the algorithms, the standards, debugging real
 > FIPS 203 code, and scenario questions — a bank in India, an SSH fleet on 9.6,
 > the fact that post-quantum key exchange is everywhere while post-quantum
 > signatures are nowhere.

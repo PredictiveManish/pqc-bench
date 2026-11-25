@@ -30,6 +30,7 @@
     fixture: fixtures/audit-app
     mode: patch
     target: app.py
+    context_files: [tests/test_app.py]
     run: ["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]
   prompt: |
     The repository `fixtures/audit-app` has weak cryptography in `app.py` and a
@@ -95,6 +96,7 @@
     fixture: fixtures/mlkem-encaps
     mode: kat
     target: encaps.py
+    context_files: [primitives.py]
     run: ["python3", "check_kat.py"]
     timeout: 120
   prompt: |

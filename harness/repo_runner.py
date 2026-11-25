@@ -71,9 +71,14 @@ def _discovery(task: dict, output: str) -> dict:
         precision = tp / len(got) if got else 0.0
         recall = tp / len(exp) if exp else 0.0
         f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-        ev_ok = sum(1 for k in tp_keys
-                    if str(got[k].get("algorithm", "")).lower().strip()
-                    == str(exp[k].get("algorithm", "")).lower().strip())
+        ev_ok = 0
+        for k in tp_keys:
+            e, g = exp[k], got[k]
+            if str(g.get("algorithm", "")).lower().strip() != str(e.get("algorithm", "")).lower().strip():
+                continue
+            if e.get("operation") and str(g.get("operation", "")).lower().strip() != str(e["operation"]).lower().strip():
+                continue
+            ev_ok += 1
         evidence = (ev_ok / tp) if tp else 0.0
         # Evidence is half the credit: right file but wrong algorithm is partial.
         score = f1 * (0.5 + 0.5 * evidence)

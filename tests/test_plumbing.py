@@ -155,6 +155,32 @@ def test_adversarial_rubric():
     check("rejecting ML-DSA does not earn the recommendation", rec["hit"] is False)
 
 
+def test_no_py311_incompatible_fstrings():
+    """Python 3.11 rejects a backslash inside an f-string replacement field
+    (PEP 701 relaxed this in 3.12). Catch it statically, since CI must be green
+    on 3.11."""
+    print("\n[compat] no 3.11-incompatible f-strings")
+    import ast
+    import pathlib
+    root = pathlib.Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    offenders = []
+    for p in root.rglob("*.py"):
+        if "__pycache__" in str(p):
+            continue
+        src = p.read_text(encoding="utf-8")
+        try:
+            tree = ast.parse(src)
+        except SyntaxError as e:
+            offenders.append(f"{p.name}: SyntaxError {e}")
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FormattedValue):
+                seg = ast.get_source_segment(src, node)
+                if seg and "\\" in seg:
+                    offenders.append(f"{p.name}:{node.lineno}: {seg.strip()[:60]}")
+    check("no backslash inside f-string fields", not offenders, offenders)
+
+
 def test_docs_match_tasks():
     print("\n[docs] README counts match the task set")
     from harness.runner import load_tasks
@@ -172,6 +198,7 @@ def main() -> int:
     test_provider_parsing()
     test_mcq_parsing()
     test_adversarial_rubric()
+    test_no_py311_incompatible_fstrings()
     test_docs_match_tasks()
     test_concurrency_and_cache()
     print("\n" + "=" * 56)

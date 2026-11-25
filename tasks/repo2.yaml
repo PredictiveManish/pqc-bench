@@ -9,12 +9,13 @@
   repo:
     fixture: fixtures/svc-indirect
     mode: discovery
+    context_files: [service.py, crypto/provider.py, config.yaml]
     expected_findings:
-      - {file: "crypto/provider.py", symbol: "hash_password", algorithm: "md5"}
-      - {file: "crypto/provider.py", symbol: "RSA2048", algorithm: "rsa-2048"}
-      - {file: "service.py", symbol: "hash_password", algorithm: "md5"}
-      - {file: "service.py", symbol: "sign_token", algorithm: "rsa-2048"}
-      - {file: "config.yaml", symbol: "signing.algorithm", algorithm: "rsa-2048"}
+      - {file: "crypto/provider.py", symbol: "hash_password", algorithm: "md5", operation: "hash"}
+      - {file: "crypto/provider.py", symbol: "RSA2048", algorithm: "rsa-2048", operation: "sign"}
+      - {file: "service.py", symbol: "hash_password", algorithm: "md5", operation: "hash"}
+      - {file: "service.py", symbol: "sign_token", algorithm: "rsa-2048", operation: "sign"}
+      - {file: "config.yaml", symbol: "signing.algorithm", algorithm: "rsa-2048", operation: "config"}
   prompt: |
     Audit the repository `fixtures/svc-indirect`. Cryptographic use is partly
     INDIRECT: `service.py` calls into `crypto/provider.py`, and some algorithms
@@ -53,6 +54,7 @@
     fixture: fixtures/svc-indirect
     mode: artifact
     target: cbom.json
+    context_files: [service.py, crypto/provider.py, config.yaml]
     run: ["python3", "check_cbom.py"]
   prompt: |
     Produce a CycloneDX-style Cryptographic Bill of Materials (CBOM) for the

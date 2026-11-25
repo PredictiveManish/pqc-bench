@@ -56,8 +56,10 @@ public, and not suitable for compliance claims.
 - [ ] Multi-language fixtures (Java/C++), which need those toolchains
 - [ ] Side-channel and constant-time challenges
 
-P3 is a different product (a *PQC-Migrate* agent benchmark), not an expansion of
-this task list. Keep the two leaderboards separate.
+Repository-level tasks now live in PQC-Eval under a separate `engineering` tier,
+scored on their own track. A full agentic migration benchmark (*PQC-Agent*:
+workspace access, multi-file patches, interoperability) remains a separate
+product. Keep the two leaderboards separate.
 
 ## Known limitations, stated plainly
 

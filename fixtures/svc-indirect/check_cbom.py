@@ -11,6 +11,8 @@ doc = json.load(open(path, encoding="utf-8"))
 
 if doc.get("bomFormat") != "CycloneDX":
     raise SystemExit("bomFormat must be CycloneDX")
+if not doc.get("specVersion"):
+    raise SystemExit("specVersion is required")
 
 components = doc.get("components")
 if not isinstance(components, list) or not components:

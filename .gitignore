@@ -2,3 +2,5 @@ __pycache__/
 *pycache*
 .cache/
 results/
+*.pyc
+LAUNCH.md

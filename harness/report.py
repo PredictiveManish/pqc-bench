@@ -21,7 +21,8 @@ def _fail_detail(d: dict) -> str:
         if d.get("violation"):
             return f"VIOLATION: {d['violation']}"
         missed = [m.get("id") for m in d.get("matched", []) if not m.get("hit")]
-        return f"coverage {d.get('raw_coverage', 0.0):.0%}; missed: {', '.join(missed) or '\u2014'}"
+        missed_text = ", ".join(missed) or EM
+        return f"coverage {d.get('raw_coverage', 0.0):.0%}; missed: {missed_text}"
     return str(d.get("msg") or d.get("violation") or "")
 
 

@@ -29,9 +29,34 @@ def load_tasks(tasks_dir: str | None = None, tiers: list[str] | None = None) -> 
                 raise ValueError(f"duplicate task id: {t['id']}")
             seen.add(t["id"])
             t["_file"] = f.name
+            t = _inject_repo_context(t)
             if not tiers or t["tier"] in tiers:
                 tasks.append(t)
     return tasks
+
+
+def _inject_repo_context(task: dict) -> dict:
+    """Append fixture files to the prompt so a repo task is answerable.
+
+    Without this the model is asked to audit a repository it never sees.
+    """
+    repo = task.get("repo") or {}
+    files = repo.get("context_files")
+    if not files:
+        return task
+    fixture = ROOT / repo["fixture"]
+    blocks = []
+    for rel in files:
+        p = fixture / rel
+        if p.exists():
+            text = p.read_text(encoding="utf-8")[:4000]
+            blocks.append(f"### {rel}\n```\n{text}\n```")
+    if not blocks:
+        return task
+    task = dict(task)
+    task["prompt"] = (task["prompt"].rstrip()
+                      + "\n\nRepository contents:\n\n" + "\n\n".join(blocks))
+    return task
 
 
 def benchmark_version(tasks: list[dict]) -> str:
