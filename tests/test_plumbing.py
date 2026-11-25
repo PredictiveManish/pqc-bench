@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import harness.providers as P
 from harness.cache import DiskCache
 from harness.providers import (AnthropicProvider, GeminiProvider,
-                               OpenAIProvider, BaseProvider)
+                               OpenAIProvider, SarvamProvider, BaseProvider)
 from harness.report import render_markdown
 from harness.runner import load_tasks, run
 from harness.types import Completion
@@ -68,6 +68,25 @@ def test_provider_parsing():
     c = GeminiProvider("gemini-x", api_key="x").complete("p")
     check("gemini parse", c.text == "yo" and c.prompt_tokens == 2
           and c.completion_tokens == 1, c)
+
+    P._post_json = lambda url, headers, payload, **kw: {
+        "choices": [{"message": {"content": "namaste"}}],
+        "model": "sarvam-105b",
+        "usage": {"prompt_tokens": 6, "completion_tokens": 3},
+    }
+    c = SarvamProvider("sarvam-105b", api_key="x").complete("p")
+    check("sarvam parse", c.text == "namaste" and c.prompt_tokens == 6
+          and c.completion_tokens == 3, c)
+
+    def _boom(url, headers, payload, **kw):
+        raise P.ProviderError("HTTP 403: {\"error\":{\"code\":\"invalid_api_key_error\"}}")
+    P._post_json = _boom
+    ok403 = False
+    try:
+        SarvamProvider("sarvam-105b", api_key="x").complete("p")
+    except P.ProviderError as e:
+        ok403 = "403" in str(e) and "SARVAM_API_KEY" in str(e)
+    check("sarvam 403 handled clearly", ok403)
 
     P._post_json = orig
 

@@ -37,8 +37,9 @@ from harness.runner import load_tasks, run
 def main() -> int:
     ap = argparse.ArgumentParser(description="Run PQC-Eval against a model.")
     ap.add_argument("--provider", required=True,
-                    choices=["openai", "anthropic", "gemini", "compatible"])
-    ap.add_argument("--model", required=True, help="model id")
+                    choices=["sarvam", "openai", "anthropic", "gemini", "compatible"])
+    ap.add_argument("--model", default=None,
+                    help="model id (default sarvam-105b for --provider sarvam)")
     ap.add_argument("--base-url", default=None,
                     help="required for --provider compatible")
     ap.add_argument("--k", type=int, default=1, help="samples per task (pass@k)")
@@ -56,6 +57,13 @@ def main() -> int:
     ap.add_argument("--price-out", type=float, default=None,
                     help="USD per 1M output tokens (for cost estimate)")
     args = ap.parse_args()
+
+    if not args.model:
+        if args.provider == "sarvam":
+            args.model = "sarvam-105b"
+        else:
+            print("error: --model is required", file=sys.stderr)
+            return 2
 
     try:
         model = make_provider(args.provider, args.model,

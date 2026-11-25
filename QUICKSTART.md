@@ -29,7 +29,7 @@ open an issue. That is the whole point of the gates.
 ## 2. Someone who wants to score a model (10 minutes + a key)
 
 ```bash
-export OPENAI_API_KEY=sk-...          # or ANTHROPIC_API_KEY / GEMINI_API_KEY
+export OPENAI_API_KEY=sk-...          # or ANTHROPIC_API_KEY / GEMINI_API_KEY / SARVAM_API_KEY
 
 # full suite
 python scripts/run_eval.py --provider openai --model gpt-4o \
@@ -39,6 +39,25 @@ python scripts/run_eval.py --provider openai --model gpt-4o \
 python scripts/run_eval.py --provider openai --model gpt-4o \
     --tiers standards,scenarios --k 1 --md results/gpt-4o-rw.md
 ```
+
+Sarvam AI (Indian models; uses your Sarvam credits):
+
+```bash
+export SARVAM_API_KEY=sk_...          # from dashboard.sarvam.ai
+
+# flagship, /v1 endpoint
+python scripts/run_eval.py --provider sarvam --model sarvam-105b \
+    --k 1 --workers 4 --md results/sarvam-105b.md
+
+# open-weight models on /v2 (glm5.3, gemma4, deepseekv4.1-flash-1017, ...)
+python scripts/run_eval.py --provider sarvam --model glm5.3 \
+    --base-url https://api.sarvam.ai/v2 --md results/sarvam-glm.md
+```
+
+Notes: `--model` defaults to `sarvam-105b`. `sarvam-m` is deprecated. Sarvam
+returns **HTTP 403** (not 401) for a bad key; the harness turns that into a clear
+message. Start with `--tiers standards,scenarios` to spend credits on the
+real-world part first.
 
 Local / self-hosted models (no vendor key):
 

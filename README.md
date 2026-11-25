@@ -36,9 +36,17 @@ python scripts/run_eval.py --provider openai --model gpt-4o \
     --k 3 --workers 8 --md results/gpt-4o.md --out results/gpt-4o.json
 ```
 
-Providers: `openai`, `anthropic`, `gemini`, or `compatible` (vLLM, Ollama,
-LM Studio, Groq, Together, OpenRouter) via `--base-url`. Keys are read from the
-environment only.
+Providers: `sarvam`, `openai`, `anthropic`, `gemini`, or `compatible` (vLLM,
+Ollama, LM Studio, Groq, Together, OpenRouter) via `--base-url`. Keys are read
+from the environment only.
+
+Sarvam AI:
+
+```bash
+export SARVAM_API_KEY=sk_...
+python scripts/run_eval.py --provider sarvam --model sarvam-105b \
+    --tiers standards,scenarios --k 1 --md results/sarvam.md
+```
 
 Flags: `--k` (pass@k), `--workers`, `--temperature`, `--tiers` (e.g.
 `standards,scenarios`), `--no-cache`, `--price-in/--price-out`.

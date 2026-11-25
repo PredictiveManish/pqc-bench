@@ -162,7 +162,63 @@ class GeminiProvider(BaseProvider):
                           completion_tokens=u.get("candidatesTokenCount", 0), raw=d)
 
 
+class SarvamProvider(BaseProvider):
+    """Sarvam AI chat completions.
+
+    OpenAI-compatible request/response shape. Authenticates with the
+    `api-subscription-key` header (Bearer also accepted by Sarvam).
+
+    Base URL defaults to /v1, which serves `sarvam-105b` and
+    `sarvam-105b-conversations`. For the open-weight models on /v2
+    (glm5.3, glm5.3-flash, gemma4, deepseekv4.1-flash-1017, ...) pass
+    --base-url https://api.sarvam.ai/v2.
+
+    Env: SARVAM_API_KEY, optional SARVAM_BASE_URL.
+    Gotcha: Sarvam returns HTTP 403 (not 401) for an invalid/missing key.
+    """
+
+    def __init__(self, model: str = "sarvam-105b", api_key: str | None = None,
+                 base_url: str | None = None):
+        self.model = model
+        self.api_key = api_key or os.environ.get("SARVAM_API_KEY", "")
+        if not self.api_key:
+            raise ProviderError("SARVAM_API_KEY is not set")
+        self.base_url = (base_url or os.environ.get(
+            "SARVAM_BASE_URL", "https://api.sarvam.ai/v1")).rstrip("/")
+        self.name = f"sarvam:{model}"
+
+    def complete(self, prompt, *, system="", temperature=0.0, max_tokens=4096):
+        msgs = []
+        if system:
+            msgs.append({"role": "system", "content": system})
+        msgs.append({"role": "user", "content": prompt})
+        payload = {"model": self.model, "messages": msgs,
+                   "temperature": temperature, "max_tokens": max_tokens}
+        try:
+            d = _post_json(self.base_url + "/chat/completions",
+                           {"Content-Type": "application/json",
+                            "api-subscription-key": self.api_key}, payload)
+        except ProviderError as e:
+            if "HTTP 403" in str(e):
+                raise ProviderError(
+                    "Sarvam auth failed (HTTP 403). Check SARVAM_API_KEY "
+                    "(Sarvam returns 403, not 401, for a bad/missing key). "
+                    f"Detail: {e}") from e
+            raise
+        choice = (d.get("choices") or [{}])[0]
+        text = (choice.get("message") or {}).get("content") or ""
+        u = d.get("usage") or {}
+        return Completion(
+            text=text,
+            model=d.get("model", self.model),
+            prompt_tokens=u.get("prompt_tokens", u.get("input_tokens", 0)),
+            completion_tokens=u.get("completion_tokens", u.get("output_tokens", 0)),
+            raw=d,
+        )
+
+
 _PROVIDERS = {
+    "sarvam": SarvamProvider,
     "openai": OpenAIProvider,
     "anthropic": AnthropicProvider,
     "gemini": GeminiProvider,
@@ -173,6 +229,8 @@ def make_provider(spec: str, model: str, *, base_url: str | None = None,
                   api_key: str | None = None) -> BaseProvider:
     if spec == "compatible":
         return OpenAICompatibleProvider(model, base_url=base_url or "", api_key=api_key)
+    if spec == "sarvam":
+        return SarvamProvider(model, api_key=api_key, base_url=base_url)
     if spec not in _PROVIDERS:
         raise ProviderError(f"unknown provider '{spec}'. "
                             f"Choose from {list(_PROVIDERS) + ['compatible']}")
