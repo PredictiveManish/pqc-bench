@@ -155,12 +155,27 @@ def test_adversarial_rubric():
     check("rejecting ML-DSA does not earn the recommendation", rec["hit"] is False)
 
 
+def _fstring_field_backslashes(src: str):
+    """Return [(lineno, segment)] for f-string EXPRESSIONS containing a backslash.
+
+    Only the expression part counts (node.value). A literal "\\n" in the text
+    part of an f-string is legal on 3.11 and must not be flagged.
+    """
+    import ast
+    hits = []
+    for node in ast.walk(ast.parse(src)):
+        if isinstance(node, ast.FormattedValue):
+            seg = ast.get_source_segment(src, node.value)
+            if seg and "\\" in seg:
+                hits.append((node.lineno, seg.strip()))
+    return hits
+
+
 def test_no_py311_incompatible_fstrings():
     """Python 3.11 rejects a backslash inside an f-string replacement field
     (PEP 701 relaxed this in 3.12). Catch it statically, since CI must be green
     on 3.11."""
     print("\n[compat] no 3.11-incompatible f-strings")
-    import ast
     import pathlib
     root = pathlib.Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     offenders = []
@@ -169,16 +184,25 @@ def test_no_py311_incompatible_fstrings():
             continue
         src = p.read_text(encoding="utf-8")
         try:
-            tree = ast.parse(src)
+            hits = _fstring_field_backslashes(src)
         except SyntaxError as e:
+            # On 3.11 a real violation fails at parse time; report it.
             offenders.append(f"{p.name}: SyntaxError {e}")
             continue
-        for node in ast.walk(tree):
-            if isinstance(node, ast.FormattedValue):
-                seg = ast.get_source_segment(src, node)
-                if seg and "\\" in seg:
-                    offenders.append(f"{p.name}:{node.lineno}: {seg.strip()[:60]}")
+        for lineno, seg in hits:
+            offenders.append(f"{p.name}:{lineno}: {seg[:60]}")
     check("no backslash inside f-string fields", not offenders, offenders)
+
+    # Self-tests so the detector cannot silently pass by finding nothing.
+    bad = 'a = 1\nb = f"{a or ' + "'" + "\\u2014" + "'" + '}"\n'
+    good = 'a = 1\nb = f"\\nvalue {a}"\n'
+    try:
+        caught = bool(_fstring_field_backslashes(bad))
+    except SyntaxError:
+        caught = True  # 3.11 rejects the bad source outright
+    check("detector catches a real violation", caught)
+    check("detector ignores literal \\n outside braces",
+          not _fstring_field_backslashes(good))
 
 
 def test_docs_match_tasks():

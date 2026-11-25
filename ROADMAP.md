@@ -26,6 +26,9 @@ public, and not suitable for compliance claims.
 - [x] Code runner scrubs secret-bearing environment variables
 - [x] Benchmark-version hash covers prompts, task metadata, checker contents and
       the scorer implementation
+- [x] Python 3.11 syntax guard: AST rule on f-string *expressions*
+      (`ast.parse(feature_version=(3,11))` does not enforce this rule, so it is
+      a heuristic proxy until CI runs a real 3.11 interpreter)
 - [ ] Official ACVP / NIST KAT vectors — round-trip consistency is not conformance
 - [~] Process-level isolation only: temp cwd, scrubbed env, rlimits,
       `unshare -n` when permitted. No filesystem namespace, no container.
