@@ -12,6 +12,9 @@ task is ungrounded.
 
 **v1.0.0 — standards-grounded.**
 
+---
+To Know more: [Technical Report Blog](https://predictivemanish.github.io/blog/pqc-eval-technical-report/)
+---
 ## What's grounded, and how
 
 - **`STANDARDS.md`** — the verified reference: FIPS 203/204/205, NIST IR 8547
